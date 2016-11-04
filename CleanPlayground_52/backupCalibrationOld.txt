@@ -1,0 +1,145 @@
+//flip the x and y coordinates if this is needed according to this XisY bool
+						//this values are read from a settings file, not from unity. 
+						//in the calibration mode the settings file can be saved altered etc.
+						//we use ints not values with dots so divide by 10000 is needed therefor
+						if (xIsY)
+						{
+							realWorldCoordinateX = int.Parse (msg [2])/ 10000.0f;
+							realWorldCoordinateY = int.Parse (msg [1])/ 10000.0f;
+							realWorldCoordinateZ = int.Parse (msg [3])/ 10000.0f;
+						}
+						else
+						{
+							realWorldCoordinateX = int.Parse (msg [1])/ 10000.0f;
+							realWorldCoordinateY = int.Parse (msg [2])/ 10000.0f;
+							realWorldCoordinateZ = int.Parse (msg [3])/ 10000.0f;
+						}
+
+					
+						calibratedRealWorldCoordinateX = realWorldCoordinateX  - xDifferenceRW;
+						calibratedRealWorldCoordinateY = realWorldCoordinateY  - yDifferenceRW;
+						calibratedRealWorldCoordinateZ = realWorldCoordinateZ;
+
+						int id = int.Parse (msg [0]);
+
+						//take into account the translation form meters to pixels/worldunits
+						//the actual coordinates used in the game are set here:
+						float x;
+
+						if (mirrorXPosition) 
+							x = xDifferenceGW - calibratedRealWorldCoordinateX *xFactor;
+						else
+							x = xDifferenceGW + calibratedRealWorldCoordinateX *xFactor;
+
+						float y;
+						 
+						if (mirrorYPosition) 
+							y = yDifferenceGW - calibratedRealWorldCoordinateY *yFactor;
+						else
+							y = yDifferenceGW + calibratedRealWorldCoordinateY *yFactor;
+
+						//used to be bullshit for now, but perhaps use it in case if the height becomes variable and you want to use it for jumping etc.
+						//uncommented on 4-12-14, before uploading, we can use this now!
+						//float z = zDifference + (realWorldCoordinateZ / 10000.0f) *zFactor;
+						float z = (realWorldCoordinateZ / 10000.0f);
+
+						if (id == calibrationID)
+						{
+							lastIncomingPosition.x =  realWorldCoordinateX;
+							lastIncomingPosition.y =  realWorldCoordinateY;
+						}
+				
+
+						//make a suggestion to move the player instead of an actual movement. In that way we can use overshoot/a wooz etc.
+						if (id < tagPlayerGameObjects.Length) {
+							//GameObject playertomove = gameObjects[id];
+							tagPlayerScript = tagPlayerGameObjects[id].GetComponent("TagPlayer") as TagPlayer;
+							//only actually sets location if single wooz is not selected in tagplayers
+
+							//TODO add padding to these bounds,
+							//we shouldn't double the error at the corners of 1 the tracker not working 100% at these edges and 
+							//2 the game kicking out players that are on these edges of recognition if they are drawn only within bounds
+							if (drawOnlyWithinBounds)
+							{
+								//we need to know the actual min and max values to compare to, this depends on the gameworld setup
+								float minX, maxX,minY,maxY;
+								if (bottomRightGame.x < topLeftGame.x)
+								{
+									minX = bottomRightGame.x;
+									maxX = topLeftGame.x;
+								}
+								else
+								{
+									minX = topLeftGame.x;
+									maxX = bottomRightGame.x;
+								}
+								
+								if (bottomRightGame.y < topLeftGame.y)
+								{
+									minY = bottomRightGame.y;
+									maxY = topLeftGame.y;
+								}
+								else
+								{
+									minY = topLeftGame.y;
+									maxY = bottomRightGame.y;
+									
+								}
+								
+								//check if it is within limits and move when it is
+								//in the game world the "y" direction is denoted as z-positions, however this is allready taken care if in the moveTo method in the tagplayerscript
+								if (x<maxX && y<maxY && x>minX && y>minY)
+									tagPlayerScript.moveTo(x,y,0.0f);
+							}
+							else
+							{
+								//in the game world the "y" direction is denoted as z-positions, however this is allready taken care off in the moveTo method in the tagplayerscript
+								if(realWorldCoordinateX!= 0.0f || realWorldCoordinateY!=0.0f)
+									tagPlayerScript.moveTo(x,y,0.0f);
+							}
+							
+							
+							
+							
+							
+							
+							================
+
+							
+//CHANGED THIS DOESN'T NEED TO BE DEPENDED on xis
+//ADDED check if they are dissappeared in the tracker, we don't need to save those. 
+if (xIsY && (realWorldCoordinateX != 0.0f || realWorldCoordinateY!=0.0f)) {
+	//logLine(id.ToString()  + "\t" + realWorldCoordinateY.ToString() + "\t" + realWorldCoordinateX.ToString() + "\t" + realWorldCoordinateZ.ToString()  + "\t" + tagPlayerScript.getIsTagger() + "\n");
+	//BUGFIX
+	//logLine(Time.realtimeSinceStartup + "," + id.ToString()  + "," + realWorldCoordinateY.ToString() + "," + realWorldCoordinateX.ToString() + "," + realWorldCoordinateZ.ToString()  + "," + tagbooltoint);
+	//USED line:
+	loggerScript.LogLineRigClientUpdate(id.ToString()  + "," + realWorldCoordinateY.ToString() + "," + realWorldCoordinateX.ToString() + "," + realWorldCoordinateZ.ToString() + ","  + tagbooltoint.ToString());
+} else if (realWorldCoordinateX != 0.0f || realWorldCoordinateY!=0.0f) {
+	//logLine(id.ToString()  + "\t" + realWorldCoordinateX.ToString() + "\t" + realWorldCoordinateY.ToString() + "\t" + realWorldCoordinateZ.ToString()  + "\t" + tagPlayerScript.getIsTagger() + "\n");
+	//BUGFIX
+	//logLine(Time.realtimeSinceStartup + "," + id.ToString()  + "," + realWorldCoordinateX.ToString() + "," + realWorldCoordinateY.ToString() + "," + realWorldCoordinateZ.ToString()  + "," + tagbooltoint);
+	//USED line:
+	loggerScript.LogLineRigClientUpdate(id.ToString()  + "," + realWorldCoordinateX.ToString() + "," + realWorldCoordinateY.ToString() + "," + realWorldCoordinateZ.ToString() + ","  + tagbooltoint.ToString());
+}
+
+
+==========================================
+if (calibration && tagPlayerGameObjects.Length>calibrationID && checkWooz)
+		{
+			
+			float x2= tagPlayerGameObjects[calibrationID].transform.position.x;
+			float y2= tagPlayerGameObjects[calibrationID].transform.position.y;
+			float z2= tagPlayerGameObjects[calibrationID].transform.position.z;
+			
+			calibrationtext.guiText.text = 
+					"TL.x" + floatRoundFunction(topLeftGame.x,4) + ", TL.y" + floatRoundFunction(topLeftGame.y,4) + "\n" 
+					+ "BR.x" + floatRoundFunction(bottomRightGame.x,4) + ", BR.y" + floatRoundFunction(bottomRightGame.y,4) + "\n"  
+					+ "TLW.x" + floatRoundFunction(topLeft.x,4) + ", TLW.y" + floatRoundFunction(topLeft.y,4) + "\n" 
+					+ "BRW.x" + floatRoundFunction(bottomRight.x,4) + ", BRW.y" + floatRoundFunction(bottomRight.y,4) + "\n"
+					+ "X:" + floatRoundFunction(x2,4).ToString()  + "Y:" + floatRoundFunction(y2,4).ToString() + "Z:" + floatRoundFunction(z2,4).ToString() + "\n"
+					+calibrationTextStateInfo;
+		}
+
+
+
+
