@@ -7,9 +7,12 @@ public class Player : MonoBehaviour {
 	public int id = -1;
 	public int trackerid =-1; 
 	public int gameid = -1;
-    
-	//this is automatically set at the start of the game and upon a change of number of alive players
-	Vector3 targetPos = new Vector3(0,0,0);
+    public Color lineColor = Color.blue;
+    public int numLines=100;
+    public GameObject[] lines;
+
+    //this is automatically set at the start of the game and upon a change of number of alive players
+    Vector3 targetPos = new Vector3(0,0,0);
 	Vector3 startPosition = new Vector3(0,0,0);
 	private float lastUpdateTime;
 	public float lastDurationUpdateTime;
@@ -49,8 +52,9 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        trail = new Vector3[20];
+        trail = new Vector3[numLines];
         trailCounter = 0;
+        lines = new GameObject[numLines];
 		//average speed over 5 frames
 		initiatePositionVector();
 
@@ -72,12 +76,13 @@ public class Player : MonoBehaviour {
 		lastDurationUpdateTime = 1.0f/25.0f; //approximate framerate
 
 
-		//you can change the material of the player in such a way:
-		//this.renderer.material = taggerMat;
-		//else
-		//	this.renderer.material = runnerMat;
+        //you can change the material of the player in such a way:
+        //this.renderer.material = taggerMat;
+        //else
+        //	this.renderer.material = runnerMat;
+        trail[0] = this.transform.localPosition;
 
-	}
+    }
 
 	// Update is called once per frame
 	void Update () {
@@ -168,22 +173,41 @@ public class Player : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-        print(lastDrawPosition + " " + this.transform.localPosition);
+// print(lastDrawPosition + " " + this.transform.localPosition);
 
-        if((lastDrawPosition.x-this.transform.localPosition.x) + (lastDrawPosition.z-this.transform.localPosition.z) !=0)
+        if(Mathf.Abs(trail[trailCounter % numLines].x-this.transform.localPosition.x) + Mathf.Abs(trail[trailCounter % numLines].z-this.transform.localPosition.z) >0.25)
         {
-            trail[trailCounter] = this.transform.localPosition;
-            if (trailCounter == 19)
+            trailCounter = trailCounter + 1;
+            trail[trailCounter % numLines] = this.transform.localPosition;
+           
+   
+         
+            GameObject.Destroy(lines[trailCounter % numLines]);
+            print("# of lines: "+lines.Length + " -- counter: " + (trailCounter % numLines));
+            lines[trailCounter % numLines] = new GameObject();
+            lines[trailCounter % numLines].transform.position = trail[trailCounter % numLines];
+            lines[trailCounter % numLines].AddComponent<LineRenderer>();
+            LineRenderer lr = lines[trailCounter % numLines].GetComponent<LineRenderer>();
+            lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+            lr.SetColors(lineColor, lineColor);
+            lr.SetWidth(0.1f, 0.1f);
+            lr.SetPosition(0, trail[trailCounter%numLines]);
+            lr.SetPosition(1, trail[(trailCounter-1)%numLines]);
+            for(int i = 1; i < numLines;i++)
             {
-                trailCounter = 0;
+                if(Mathf.Abs(trail[trailCounter % numLines].x - trail[(trailCounter+i)%numLines].x) + Mathf.Abs(trail[trailCounter % numLines].z - trail[(trailCounter + i) % numLines].z) < 0.25){
+                    print("COLLISION!!@@#@#");
+                    trail = new Vector3[numLines];
+                    trailCounter = 0;
+                    trail[0] = this.transform.localPosition;
+                    for (int j = 1; j < numLines; j++)
+                    {
+                        GameObject.Destroy(lines[j]);
+                    }
+                    lines = new GameObject[numLines];
+                }
             }
-            else
-            {
-                trailCounter = trailCounter + 1;
-            }
-            print(trail);
-            DrawLine(this.transform.localPosition, lastDrawPosition, 20.0f);
-            lastDrawPosition = this.transform.localPosition;
+
         }
         
 
@@ -309,25 +333,7 @@ public class Player : MonoBehaviour {
 		if (Input.GetKey(KeyCode.LeftArrow))
 		{
 			moveVectorK.x = -0.1f;
-		}
-		
+		}	
 		//this.transform.localPosition = Vector3.Lerp(this.transform.localPosition, this.transform.localPosition+moveVectorK, singleWoozDeltatimeMultiplier*Time.deltaTime);
 	}
-    void DrawLine(Vector3 start, Vector3 end, float duration = 0.2f)
-    {
-        Color color = Color.blue;
-        GameObject myLine = new GameObject();
-        myLine.transform.position = start;
-        myLine.AddComponent<LineRenderer>();
-        LineRenderer lr = myLine.GetComponent<LineRenderer>();
-        lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-        lr.SetColors(color, color);
-        lr.SetWidth(0.1f, 0.1f);
-        lr.SetPosition(0, start);
-        lr.SetPosition(1, end);
-        GameObject.Destroy(myLine, duration);
-    }
-
-
-
 }
