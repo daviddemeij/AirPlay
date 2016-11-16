@@ -48,12 +48,14 @@
      <Compile Include="Assets\scripts\BackGroundChanger.cs" />
      <Compile Include="Assets\scripts\CalibrationOfPlayground.cs" />
      <Compile Include="Assets\scripts\CollisionDetector.cs" />
+     <Compile Include="Assets\scripts\CreatePlaneMesh.cs" />
      <Compile Include="Assets\scripts\GameSettings.cs" />
      <Compile Include="Assets\scripts\KeyHandling.cs" />
      <Compile Include="Assets\scripts\KinectRigClient.cs" />
      <Compile Include="Assets\scripts\Logger.cs" />
      <Compile Include="Assets\scripts\Player.cs" />
      <Compile Include="Assets\scripts\Wooz.cs" />
+     <Compile Include="Assets\scripts\buildMesh.cs" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/David/Documents/GitHub/AirPlay/CleanPlayground_52/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>

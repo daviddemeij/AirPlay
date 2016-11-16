@@ -52,6 +52,8 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+
+
         trail = new Vector3[numLines];
         trailCounter = 0;
         lines = new GameObject[numLines];
@@ -193,6 +195,7 @@ public class Player : MonoBehaviour {
             lr.SetWidth(0.1f, 0.1f);
             lr.SetPosition(0, trail[trailCounter%numLines]);
             lr.SetPosition(1, trail[(trailCounter-1)%numLines]);
+            print(trail[0]);
             for(int i = 1; i < numLines;i++)
             {
                 if(Mathf.Abs(trail[trailCounter % numLines].x - trail[(trailCounter+i)%numLines].x) + Mathf.Abs(trail[trailCounter % numLines].z - trail[(trailCounter + i) % numLines].z) < 0.25){
