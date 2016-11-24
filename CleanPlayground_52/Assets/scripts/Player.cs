@@ -2,7 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 public class Player : MonoBehaviour {
-	public float positionx;
+    public Transform collisionMeshPrefab;
+    //[HideInInspector]public GameObject[] lines;
+    [HideInInspector]public GameObject collisionMeshObject;
+    public float positionx;
 	public float positiony;
 	public int id = -1;
 	public int trackerid =-1; 
@@ -37,7 +40,6 @@ public class Player : MonoBehaviour {
 	//keep count of "speed" 
 	public Vector2[] positionsForSpeed;
 	public int sizeOfSpeedVector = 15;
-
 	//!!!! assign this in the scene per player it should be the actual arrow group in the scene not a prefab, thus it is assigned in the scene not in the prefab!
 	private GameObject mainCameraObject;
 
@@ -47,12 +49,16 @@ public class Player : MonoBehaviour {
 
     private Vector3[] trail;
     private int trailCounter;
+    //public buildMesh missile;
     //you might want to switch materials based on somec conditions
     //Material taggerMat, runnerMat;
 
     // Use this for initialization
     void Start () {
 
+
+
+        //buildMesh missileCopy = Instantiate<buildMesh>(missile);
 
         trail = new Vector3[numLines];
         trailCounter = 0;
@@ -187,6 +193,7 @@ public class Player : MonoBehaviour {
             GameObject.Destroy(lines[trailCounter % numLines]);
             print("# of lines: "+lines.Length + " -- counter: " + (trailCounter % numLines));
             lines[trailCounter % numLines] = new GameObject();
+            lines[trailCounter % numLines].name = "Line" + trailCounter;
             lines[trailCounter % numLines].transform.position = trail[trailCounter % numLines];
             lines[trailCounter % numLines].AddComponent<LineRenderer>();
             LineRenderer lr = lines[trailCounter % numLines].GetComponent<LineRenderer>();
@@ -200,6 +207,83 @@ public class Player : MonoBehaviour {
             {
                 if(Mathf.Abs(trail[trailCounter % numLines].x - trail[(trailCounter+i)%numLines].x) + Mathf.Abs(trail[trailCounter % numLines].z - trail[(trailCounter + i) % numLines].z) < 0.25){
                     print("COLLISION!!@@#@#");
+                    //ransform collisionMesh;
+                    //collisionMesh = Instantiate(collisionMeshPrefab) as Transform;
+
+                    collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
+                    collisionMeshObject.name = "Collision!";
+                    Vector3[] collisionVertices = new Vector3[Mathf.Abs(trailCounter%numLines - i)+1];
+
+                    Vector3 average = new Vector3(0, 0, 0);
+                    int counter = 0;
+                    if(Vector3.SqrMagnitude(trail[trailCounter%numLines+1]-Vector3.zero)>0.001) // Go from traiLCounter to i positive steps
+                    {
+                        print("go from trailcounter to i");
+                        print("trail trailcounter-1" + trail[trailCounter%numLines - 1] + " trail trailcounter+1" + trail[trailCounter%numLines + 1]);
+                        if (i < trailCounter % numLines) // use i+numLines
+                        {
+                            for (int p = trailCounter%numLines; p < i+numLines; p++)
+                            {
+                                collisionVertices[counter] = trail[p%numLines];
+                                average = average + trail[p%numLines];
+                                counter = counter + 1;
+                                print("p " + p + " trail" + trail[p % numLines]);
+                            }
+                        }
+                        else // use i
+                        {
+                            for (int p = trailCounter % numLines; p < i; p++)
+                            {
+                                collisionVertices[counter] = trail[p % numLines];
+                                average = average + trail[p % numLines];
+                                counter = counter + 1;
+                                print("p " + p + " trail" + trail[p % numLines]);
+                            }
+                        }
+                    }
+                    else // Go negative from trailCounter
+                    {
+                        if (i < trailCounter % numLines) // use trailcounter
+                        {
+                            for (int p = trailCounter; p >i; p--)
+                            {
+                                collisionVertices[counter] = trail[p % numLines];
+                                average = average + trail[p % numLines];
+                                counter = counter + 1;
+                                print("p " + p + " trail" + trail[p % numLines]);
+                            }
+                        }
+                        else // use trailcounter+numlines
+                        {
+                            for (int p = trailCounter+numLines; p >i; p--)
+                            {
+                                collisionVertices[counter] = trail[p % numLines];
+                                average = average + trail[p % numLines];
+                                counter = counter + 1;
+                                print("p " + p + " trail" + trail[p % numLines]);
+                            }
+                        }
+                    }
+                    
+                    average = average / (numLines-1);
+                    print("i: " + i + " trailCounter % numLines " + trailCounter % numLines);
+                    print("Average: " + average + " last vertice: " + collisionVertices[Mathf.Abs(trailCounter % numLines - i)] + " first vertice " + collisionVertices[0] + " 2nd vertice "+ collisionVertices[1]);
+                    collisionVertices[counter] = average;
+                        //{
+                        //new Vector3(1,0,-1), // top left
+                        //new Vector3(2,0,-1), // top right
+                        //new Vector3(1,0,-3), // bottom left
+                        //new Vector3(2,0,-3), // bottom right
+                        //new Vector3(1,0,-1),
+                        //new Vector3(2,0,-1),
+                        //new Vector3(2,0,-3),
+                        //new Vector3(1,0,-3),
+                        //new Vector3(0.5f,0,-2),
+                        // AVERAGE
+                        //new Vector3(1.3f,0,-2)
+
+                        //};
+                    collisionMeshObject.GetComponent<buildMesh>().setVertices(collisionVertices);
                     trail = new Vector3[numLines];
                     trailCounter = 0;
                     trail[0] = this.transform.localPosition;

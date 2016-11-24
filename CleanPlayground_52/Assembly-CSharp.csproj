@@ -48,7 +48,6 @@
      <Compile Include="Assets\scripts\BackGroundChanger.cs" />
      <Compile Include="Assets\scripts\CalibrationOfPlayground.cs" />
      <Compile Include="Assets\scripts\CollisionDetector.cs" />
-     <Compile Include="Assets\scripts\CreatePlaneMesh.cs" />
      <Compile Include="Assets\scripts\GameSettings.cs" />
      <Compile Include="Assets\scripts\KeyHandling.cs" />
      <Compile Include="Assets\scripts\KinectRigClient.cs" />
