@@ -212,63 +212,28 @@ public class Player : MonoBehaviour {
 
                     collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
                     collisionMeshObject.name = "Collision!";
-                    Vector3[] collisionVertices = new Vector3[Mathf.Abs(trailCounter%numLines - i)+1];
-
-                    Vector3 average = new Vector3(0, 0, 0);
-                    int counter = 0;
-                    if(Vector3.SqrMagnitude(trail[trailCounter%numLines+1]-Vector3.zero)>0.001) // Go from traiLCounter to i positive steps
-                    {
-                        print("go from trailcounter to i");
-                        print("trail trailcounter-1" + trail[trailCounter%numLines - 1] + " trail trailcounter+1" + trail[trailCounter%numLines + 1]);
-                        if (i < trailCounter % numLines) // use i+numLines
-                        {
-                            for (int p = trailCounter%numLines; p < i+numLines; p++)
-                            {
-                                collisionVertices[counter] = trail[p%numLines];
-                                average = average + trail[p%numLines];
-                                counter = counter + 1;
-                                print("p " + p + " trail" + trail[p % numLines]);
-                            }
-                        }
-                        else // use i
-                        {
-                            for (int p = trailCounter % numLines; p < i; p++)
-                            {
-                                collisionVertices[counter] = trail[p % numLines];
-                                average = average + trail[p % numLines];
-                                counter = counter + 1;
-                                print("p " + p + " trail" + trail[p % numLines]);
-                            }
-                        }
-                    }
-                    else // Go negative from trailCounter
-                    {
-                        if (i < trailCounter % numLines) // use trailcounter
-                        {
-                            for (int p = trailCounter; p >i; p--)
-                            {
-                                collisionVertices[counter] = trail[p % numLines];
-                                average = average + trail[p % numLines];
-                                counter = counter + 1;
-                                print("p " + p + " trail" + trail[p % numLines]);
-                            }
-                        }
-                        else // use trailcounter+numlines
-                        {
-                            for (int p = trailCounter+numLines; p >i; p--)
-                            {
-                                collisionVertices[counter] = trail[p % numLines];
-                                average = average + trail[p % numLines];
-                                counter = counter + 1;
-                                print("p " + p + " trail" + trail[p % numLines]);
-                            }
-                        }
-                    }
                     
-                    average = average / (numLines-1);
+                    Vector3 average = new Vector3(0, 0, 0);
+                    int numVertices = 0;
+                    for(int q = 0; q < numLines; q++)
+                    {
+                        if (Vector3.SqrMagnitude(trail[q] - Vector3.zero) > 0.001) { numVertices++; }
+                    }
+                    Vector3[] collisionVertices = new Vector3[numVertices];
+                    int counter = 0;
+                    for (int q = 0; q < numLines; q++)
+                    {
+                        if (Vector3.SqrMagnitude(trail[q] - Vector3.zero) > 0.001)
+                        {
+                            collisionVertices[counter] = trail[q];
+                            average = average + trail[q];
+                            counter = counter + 1;
+                        }
+                    }
+                    average = average / (numVertices-1);
                     print("i: " + i + " trailCounter % numLines " + trailCounter % numLines);
-                    print("Average: " + average + " last vertice: " + collisionVertices[Mathf.Abs(trailCounter % numLines - i)] + " first vertice " + collisionVertices[0] + " 2nd vertice "+ collisionVertices[1]);
-                    collisionVertices[counter] = average;
+                    print("Average: " + average + " last vertice: " + collisionVertices[numVertices-1] + " first vertice " + collisionVertices[0] + " 2nd vertice "+ collisionVertices[1]);
+                    collisionVertices[numVertices-1] = average;
                         //{
                         //new Vector3(1,0,-1), // top left
                         //new Vector3(2,0,-1), // top right
