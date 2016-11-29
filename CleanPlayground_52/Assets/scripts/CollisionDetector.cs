@@ -32,16 +32,20 @@ public class CollisionDetector : MonoBehaviour {
 	void OnTriggerEnter(Collider myTrigger)
 	{
 		//indeed player:
-		//print("tagcollision name" + myTrigger.gameObject.transform.parent.name);
+		print("tagcollision name: " + myTrigger.gameObject.transform.parent.name + " & "+ thisPlayer.name);
 
-		//check on null to deal with no parent
-		if(myTrigger.gameObject.transform.parent != null && myTrigger.gameObject.transform.parent.name == "player")
+        //check on null to deal with no parent
+
+        if (myTrigger.gameObject.transform.parent != null && myTrigger.gameObject.transform.parent.tag == "Player")
 		{ 
 			GameObject playercollision = myTrigger.transform.parent.gameObject;
 			string triggername = myTrigger.gameObject.transform.name;
 			playSound();
-			print ("debug line" + triggername);
-		}
+			print ("debug line " + triggername);
+            if (thisPlayer.isTagger) { myTrigger.gameObject.transform.parent.GetComponent<Player>().isTagger = true; }
+
+            
+        }
 		//powerUpOrbit , powerUpScaleDown, powerUpScaleUp, powerUpShield
 		else 
 		{

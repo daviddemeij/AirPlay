@@ -158,10 +158,11 @@ public class trailScript : MonoBehaviour
                 {
            
 
-                    print("loop: " + loopVertices.Length);
+                    //print("loop: " + loopVertices.Length);
                     collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
                     collisionMeshObject.name = "Collision!";
                     collisionMeshObject.GetComponent<buildMesh>().setVertices(loopVertices);
+                    //collisionMeshObject.AddComponent(MeshCollider).sharedMesh = mesh;
 
                     collisionMeshObjectReversed = Instantiate(collisionMeshPrefab).transform.gameObject;
                     collisionMeshObjectReversed.name = "Collision Reversed!";
@@ -190,7 +191,7 @@ public class trailScript : MonoBehaviour
    
             if ((center.Value - position).sqrMagnitude < vertexDistanceMin * vertexDistanceMin)
             {
-                print("Collision! at i=" + i + " out of " + centerPositions.Count);
+                //print("Collision! at i=" + i + " out of " + centerPositions.Count);
                 loopVertices = new Vector3[loop.Count+1];
                 loopVerticesReversed = new Vector3[loop.Count + 1];
                 Vector3 average = new Vector3(0, 0, 0);

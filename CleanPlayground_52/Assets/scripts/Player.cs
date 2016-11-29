@@ -2,6 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 public class Player : MonoBehaviour {
+    public bool isTagger;
+    public Material runnerMat;
+    public Material taggerMat;
+    [HideInInspector]public bool currentMatTagger = false;
 
     //[HideInInspector]public GameObject[] lines;
     [HideInInspector]public GameObject collisionMeshObject;
@@ -48,12 +52,22 @@ public class Player : MonoBehaviour {
     void Start () {
 
 
-
+        if (isTagger)
+        {
+            currentMatTagger = true;
+            this.GetComponent<Renderer>().material = taggerMat;
+        }
+        else
+        {
+            currentMatTagger = false;
+            this.GetComponent<Renderer>().material = runnerMat;
+        }
+        
         //buildMesh missileCopy = Instantiate<buildMesh>(missile);
 
-  
-		//average speed over 5 frames
-		initiatePositionVector();
+
+        //average speed over 5 frames
+        initiatePositionVector();
 
     //be able to switch the background if something happends
         backgroundImageObject = GameObject.FindGameObjectWithTag("BackgroundImage");
@@ -77,6 +91,19 @@ public class Player : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+        // Set right material based on who is the tagger
+        if (isTagger && !currentMatTagger)
+        {
+            print("currentmattagger " + currentMatTagger);
+            currentMatTagger = true;
+            this.GetComponent<Renderer>().material = taggerMat;
+        }
+        else if (!isTagger && currentMatTagger)
+        {
+            currentMatTagger = false;
+            this.GetComponent<Renderer>().material = runnerMat;
+        }
+        
         //WoozPlayer are wooz of oz players, we switch between normal server controlled players and wooz with pressing W in the game
         if (singleWoozPlayer)
 		{

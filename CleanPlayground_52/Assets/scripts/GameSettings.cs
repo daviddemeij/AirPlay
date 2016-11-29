@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameSettings : MonoBehaviour {
 
-	public int nrOfPlayers = 6;
+	public int nrOfPlayers = 0;
+    public List<int> taggers;
 	//we need to use a woozscript;
 	Wooz woozScript;
 
@@ -58,6 +60,7 @@ public class GameSettings : MonoBehaviour {
 			startPositionOfFirstPlayer.x = startPositionOfFirstPlayer.x + 0.4f;
 			lastCreatedPlayer = Instantiate(playerPrefab, startPositionOfFirstPlayer, Quaternion.LookRotation(Vector3.back)) as Transform;
 			lastCreatedPlayer.name = "player " +i;
+         
 		}
 
 		//i++ so number of i " is now 6, although it was 5 in last run for loop
@@ -82,7 +85,11 @@ public class GameSettings : MonoBehaviour {
 					playerScript = playerGameObjects[i].GetComponent("Player") as Player;
 					playerScript.id =i;
 					playerGameObjects[i].name = "player " +i;
-				}
+                    if (taggers.Contains(i))
+                    {
+                        playerScript.isTagger = true;
+                    }
+                }
 			}
 			i = i+1;
 		}

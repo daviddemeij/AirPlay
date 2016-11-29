@@ -37,14 +37,15 @@ public class buildMesh : MonoBehaviour {
 
         }
 
-
+        //MeshCollider myMC = GetComponent<MeshCollider>();
         mesh.Clear();
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.uv = uvs;
         mesh.Optimize();
         mesh.RecalculateNormals();
-	}
+        //myMC.sharedMesh = mesh;
+    }
 	
 
 }
