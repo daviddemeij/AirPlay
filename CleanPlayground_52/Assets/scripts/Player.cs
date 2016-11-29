@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public class Player : MonoBehaviour {
-    public Transform collisionMeshPrefab;
+
     //[HideInInspector]public GameObject[] lines;
     [HideInInspector]public GameObject collisionMeshObject;
     public float positionx;
@@ -10,9 +10,7 @@ public class Player : MonoBehaviour {
 	public int id = -1;
 	public int trackerid =-1; 
 	public int gameid = -1;
-    public Color lineColor = Color.blue;
-    public int numLines=100;
-    public GameObject[] lines;
+
 
     //this is automatically set at the start of the game and upon a change of number of alive players
     Vector3 targetPos = new Vector3(0,0,0);
@@ -27,8 +25,7 @@ public class Player : MonoBehaviour {
 	public bool singleWoozPlayer;
 	public float singleWoozDeltatimeMultiplier = 100.0f; //changes the speed with which the wooz player is moved
 
-    private float lastDrawTime;
-    Vector3 lastDrawPosition;
+
     //TODO re add moveVectorK it was used for the wooz
     Vector3 moveVectorK;
 
@@ -47,12 +44,6 @@ public class Player : MonoBehaviour {
 	private BackGroundChanger backgroundChangerScript;
 	private GameObject backgroundImageObject;
 
-    private Vector3[] trail;
-    private int trailCounter;
-    //public buildMesh missile;
-    //you might want to switch materials based on somec conditions
-    //Material taggerMat, runnerMat;
-
     // Use this for initialization
     void Start () {
 
@@ -60,9 +51,7 @@ public class Player : MonoBehaviour {
 
         //buildMesh missileCopy = Instantiate<buildMesh>(missile);
 
-        trail = new Vector3[numLines];
-        trailCounter = 0;
-        lines = new GameObject[numLines];
+  
 		//average speed over 5 frames
 		initiatePositionVector();
 
@@ -74,8 +63,7 @@ public class Player : MonoBehaviour {
 		loggerScript = mainCameraObject.GetComponent("Logger") as Logger;
 
 		startPosition = this.gameObject.transform.position;
-        lastDrawTime = Time.realtimeSinceStartup;
-        lastDrawPosition = startPosition;
+
 
         targetPos = startPosition;
 
@@ -84,17 +72,11 @@ public class Player : MonoBehaviour {
 		lastDurationUpdateTime = 1.0f/25.0f; //approximate framerate
 
 
-        //you can change the material of the player in such a way:
-        //this.renderer.material = taggerMat;
-        //else
-        //	this.renderer.material = runnerMat;
-        trail[0] = this.transform.localPosition;
 
     }
 
 	// Update is called once per frame
 	void Update () {
-
         //WoozPlayer are wooz of oz players, we switch between normal server controlled players and wooz with pressing W in the game
         if (singleWoozPlayer)
 		{
@@ -181,86 +163,14 @@ public class Player : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-// print(lastDrawPosition + " " + this.transform.localPosition);
 
-        if(Mathf.Abs(trail[trailCounter % numLines].x-this.transform.localPosition.x) + Mathf.Abs(trail[trailCounter % numLines].z-this.transform.localPosition.z) >0.25)
-        {
-            trailCounter = trailCounter + 1;
-            trail[trailCounter % numLines] = this.transform.localPosition;
-           
-   
-         
-            GameObject.Destroy(lines[trailCounter % numLines]);
-            print("# of lines: "+lines.Length + " -- counter: " + (trailCounter % numLines));
-            lines[trailCounter % numLines] = new GameObject();
-            lines[trailCounter % numLines].name = "Line" + trailCounter;
-            lines[trailCounter % numLines].transform.position = trail[trailCounter % numLines];
-            lines[trailCounter % numLines].AddComponent<LineRenderer>();
-            LineRenderer lr = lines[trailCounter % numLines].GetComponent<LineRenderer>();
-            lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-            lr.SetColors(lineColor, lineColor);
-            lr.SetWidth(0.1f, 0.1f);
-            lr.SetPosition(0, trail[trailCounter%numLines]);
-            lr.SetPosition(1, trail[(trailCounter-1)%numLines]);
-            print(trail[0]);
-            for(int i = 1; i < numLines;i++)
-            {
-                if(Mathf.Abs(trail[trailCounter % numLines].x - trail[(trailCounter+i)%numLines].x) + Mathf.Abs(trail[trailCounter % numLines].z - trail[(trailCounter + i) % numLines].z) < 0.25){
-                    print("COLLISION!!@@#@#");
-                    //ransform collisionMesh;
-                    //collisionMesh = Instantiate(collisionMeshPrefab) as Transform;
+       
 
-                    collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
-                    collisionMeshObject.name = "Collision!";
-                    
-                    Vector3 average = new Vector3(0, 0, 0);
-                    int numVertices = 0;
-                    for(int q = 0; q < numLines; q++)
-                    {
-                        if (Vector3.SqrMagnitude(trail[q] - Vector3.zero) > 0.001) { numVertices++; }
-                    }
-                    Vector3[] collisionVertices = new Vector3[numVertices];
-                    int counter = 0;
-                    for (int q = 0; q < numLines; q++)
-                    {
-                        if (Vector3.SqrMagnitude(trail[q] - Vector3.zero) > 0.001)
-                        {
-                            collisionVertices[counter] = trail[q];
-                            average = average + trail[q];
-                            counter = counter + 1;
-                        }
-                    }
-                    average = average / (numVertices-1);
-                    print("i: " + i + " trailCounter % numLines " + trailCounter % numLines);
-                    print("Average: " + average + " last vertice: " + collisionVertices[numVertices-1] + " first vertice " + collisionVertices[0] + " 2nd vertice "+ collisionVertices[1]);
-                    collisionVertices[numVertices-1] = average;
-                        //{
-                        //new Vector3(1,0,-1), // top left
-                        //new Vector3(2,0,-1), // top right
-                        //new Vector3(1,0,-3), // bottom left
-                        //new Vector3(2,0,-3), // bottom right
-                        //new Vector3(1,0,-1),
-                        //new Vector3(2,0,-1),
-                        //new Vector3(2,0,-3),
-                        //new Vector3(1,0,-3),
-                        //new Vector3(0.5f,0,-2),
-                        // AVERAGE
-                        //new Vector3(1.3f,0,-2)
+                   
+              
+            
 
-                        //};
-                    collisionMeshObject.GetComponent<buildMesh>().setVertices(collisionVertices);
-                    trail = new Vector3[numLines];
-                    trailCounter = 0;
-                    trail[0] = this.transform.localPosition;
-                    for (int j = 1; j < numLines; j++)
-                    {
-                        GameObject.Destroy(lines[j]);
-                    }
-                    lines = new GameObject[numLines];
-                }
-            }
-
-        }
+        
         
 
 		if(!woozIsOn && !singleWoozPlayer)

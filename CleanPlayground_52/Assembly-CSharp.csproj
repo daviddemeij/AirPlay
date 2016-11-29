@@ -55,6 +55,7 @@
      <Compile Include="Assets\scripts\Player.cs" />
      <Compile Include="Assets\scripts\Wooz.cs" />
      <Compile Include="Assets\scripts\buildMesh.cs" />
+     <Compile Include="Assets\trailScript.cs" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/David/Documents/GitHub/AirPlay/CleanPlayground_52/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
