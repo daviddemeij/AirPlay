@@ -32,7 +32,7 @@ public class CollisionDetector : MonoBehaviour {
 	void OnTriggerEnter(Collider myTrigger)
 	{
 		//indeed player:
-		print("tagcollision name: " + myTrigger.gameObject.transform.parent.name + " & "+ thisPlayer.name);
+		//print("tagcollision name: " + myTrigger.gameObject.transform.parent.name + " & "+ thisPlayer.name);
 
         //check on null to deal with no parent
 
@@ -50,11 +50,16 @@ public class CollisionDetector : MonoBehaviour {
 		else 
 		{
 			string triggername = myTrigger.gameObject.transform.name;
-			GameObject powerUpObject = myTrigger.gameObject;
-			GameObject parentOfPU = powerUpObject.transform.parent.gameObject;
+            print(triggername+" triggers "+thisPlayer.name);
+			//GameObject powerUpObject = myTrigger.gameObject;
+			//GameObject parentOfPU = powerUpObject.transform.parent.gameObject;
 			//only if you are a runner you can collect the particles
 			//and only if you havent just been tagged, either when you were protected (swagged) or when you just tagged someone
 			//the upper prevents people from chasing the runner all the time and become invincible
+            //if (triggername == "loopObject" || triggername == "loopObjectReversed")
+            //{
+            ///    if (thisPlayer.isTagger) { thisPlayer.isTagger = false; }
+            //}
 			if (triggername == "particleCollider")
 			{
 				if(!GetComponent<AudioSource>().isPlaying) 

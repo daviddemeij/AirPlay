@@ -47,20 +47,23 @@ public class Player : MonoBehaviour {
 	private Logger loggerScript;
 	private BackGroundChanger backgroundChangerScript;
 	private GameObject backgroundImageObject;
+    public trailScript trailscript;
 
     // Use this for initialization
     void Start () {
-
+        trailscript = this.GetComponent<trailScript>();
 
         if (isTagger)
         {
             currentMatTagger = true;
             this.GetComponent<Renderer>().material = taggerMat;
+            trailscript.enabled = false;
         }
         else
         {
             currentMatTagger = false;
             this.GetComponent<Renderer>().material = runnerMat;
+            trailscript.enabled = true;
         }
         
         //buildMesh missileCopy = Instantiate<buildMesh>(missile);
@@ -97,11 +100,13 @@ public class Player : MonoBehaviour {
             print("currentmattagger " + currentMatTagger);
             currentMatTagger = true;
             this.GetComponent<Renderer>().material = taggerMat;
+            trailscript.enabled = false;
         }
         else if (!isTagger && currentMatTagger)
         {
             currentMatTagger = false;
             this.GetComponent<Renderer>().material = runnerMat;
+            trailscript.enabled = true;
         }
         
         //WoozPlayer are wooz of oz players, we switch between normal server controlled players and wooz with pressing W in the game

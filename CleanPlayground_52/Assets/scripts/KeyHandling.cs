@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 
 //TODO make a seperate scene in which we deal with setting the calibration and use loading on start in an actual game
@@ -54,6 +55,10 @@ public class KeyHandling : MonoBehaviour {
 
 	//TODO in Wooz script there are also some keyhandling settings left
 	void handleKeySettings(){
+        if (Input.GetKeyUp(KeyCode.R)){
+
+            SceneManager.LoadScene("simplifiedTrackerGame");
+        }
 				
 		if (Input.GetKeyUp(KeyCode.C))
 		{

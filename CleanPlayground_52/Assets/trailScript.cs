@@ -149,25 +149,40 @@ public class trailScript : MonoBehaviour
             rightVertices.AddFirst(new Vertex(rightPos, trans.position, (rightPos - trans.position).normalized));
 
             //add the current position as the most recent center position
-            if (centerPositions.Count > 10)
+            if (centerPositions.Count > 15)
             {
                 Vector3[] loopVertices = new Vector3[0];
                 Vector3[] loopVerticesReversed = new Vector3[0];
                 checkCollision(trans.position, out loopVertices, out loopVerticesReversed);
                 if (loopVertices.Length != 0)
                 {
-           
+                    print("loop object created of length "+loopVertices.Length);
+                    //set the first center position as the current position
+                    centerPositions = new LinkedList<Vector3>();
+                    //centerPositions.AddFirst(trans.position);
+
+                    leftVertices = new LinkedList<Vertex>();
+                    rightVertices = new LinkedList<Vertex>();
 
                     //print("loop: " + loopVertices.Length);
                     collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
-                    collisionMeshObject.name = "Collision!";
+                    collisionMeshObject.name = "loopObject";
                     collisionMeshObject.GetComponent<buildMesh>().setVertices(loopVertices);
                     //collisionMeshObject.AddComponent(MeshCollider).sharedMesh = mesh;
 
                     collisionMeshObjectReversed = Instantiate(collisionMeshPrefab).transform.gameObject;
-                    collisionMeshObjectReversed.name = "Collision Reversed!";
+                    collisionMeshObjectReversed.name = "loopObjectReversed";
                     collisionMeshObjectReversed.GetComponent<buildMesh>().setVertices(loopVerticesReversed);
-
+                    foreach (var gameObj in FindObjectsOfType(typeof(Player)) as Player[])
+                    {
+                        if (gameObj.isTagger)
+                        {
+                            if (collisionMeshObject.GetComponent<MeshCollider>().bounds.Contains(gameObj.transform.position))
+                            {
+                                gameObj.isTagger = false;
+                            }
+                        }
+                    }
                 }
             }
             centerPositions.AddFirst(trans.position);
