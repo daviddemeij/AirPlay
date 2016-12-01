@@ -3,8 +3,10 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
     public bool isTagger;
+    public bool freezed;
+    public int powerUpCounter = 0;
     public Material runnerMat;
-    public Material taggerMat;
+    public Material[] taggerMat;
     [HideInInspector]public bool currentMatTagger = false;
 
     //[HideInInspector]public GameObject[] lines;
@@ -45,26 +47,14 @@ public class Player : MonoBehaviour {
 	private GameObject mainCameraObject;
 
 	private Logger loggerScript;
-	private BackGroundChanger backgroundChangerScript;
 	private GameObject backgroundImageObject;
     public trailScript trailscript;
-
+    public GameSettings gamesettings;
     // Use this for initialization
     void Start () {
+        
         trailscript = this.GetComponent<trailScript>();
-
-        if (isTagger)
-        {
-            currentMatTagger = true;
-            this.GetComponent<Renderer>().material = taggerMat;
-            trailscript.enabled = false;
-        }
-        else
-        {
-            currentMatTagger = false;
-            this.GetComponent<Renderer>().material = runnerMat;
-            trailscript.enabled = true;
-        }
+        updateTaggerMaterial();
         
         //buildMesh missileCopy = Instantiate<buildMesh>(missile);
 
@@ -75,7 +65,7 @@ public class Player : MonoBehaviour {
     //be able to switch the background if something happends
         backgroundImageObject = GameObject.FindGameObjectWithTag("BackgroundImage");
 		mainCameraObject = GameObject.FindGameObjectWithTag("MainCamera");
-		backgroundChangerScript = backgroundImageObject.GetComponent("BackGroundChanger") as BackGroundChanger;
+        gamesettings = mainCameraObject.GetComponent<GameSettings>();
 
 		loggerScript = mainCameraObject.GetComponent("Logger") as Logger;
 
@@ -98,15 +88,15 @@ public class Player : MonoBehaviour {
         if (isTagger && !currentMatTagger)
         {
             print("currentmattagger " + currentMatTagger);
-            currentMatTagger = true;
-            this.GetComponent<Renderer>().material = taggerMat;
-            trailscript.enabled = false;
+            updateTaggerMaterial();
+            checkGameEnd();
+            
         }
-        else if (!isTagger && currentMatTagger)
+        else if (!isTagger && currentMatTagger) // if the player is not the tagger, but the used material is of the tagger -> change material
         {
-            currentMatTagger = false;
-            this.GetComponent<Renderer>().material = runnerMat;
-            trailscript.enabled = true;
+            updateTaggerMaterial();
+            checkGameEnd();
+
         }
         
         //WoozPlayer are wooz of oz players, we switch between normal server controlled players and wooz with pressing W in the game
@@ -195,17 +185,7 @@ public class Player : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-
-       
-
-                   
-              
-            
-
-        
-        
-
-		if(!woozIsOn && !singleWoozPlayer)
+	if(!woozIsOn && !singleWoozPlayer)
 		{
 			//the updaterate from the moveTo is taken from the kinectrig and is approximmetly 30fps the lastUpdateTime and the lastDuration are also set there
 			//the update of update is supposed to be quicker
@@ -242,9 +222,61 @@ public class Player : MonoBehaviour {
 			positionsForSpeed[i] = positionsForSpeed[0];
 		}
 	}
+    public void updateTaggerMaterial()
+    {
+        if (isTagger)
+        {
+            currentMatTagger = true;
+            if (powerUpCounter > taggerMat.Length-1)
+            {
+                this.GetComponent<Renderer>().material = taggerMat[taggerMat.Length-1];
+            }
+            else
+            {
+                this.GetComponent<Renderer>().material = taggerMat[powerUpCounter];
+            }
+            
+            trailscript.enabled = false;
+        }
+        else
+        {
+            currentMatTagger = false;
+            this.GetComponent<Renderer>().material = runnerMat;
+            trailscript.enabled = true;
+        }
 
-	//THERE IS SOMETHING STRANGE HAPPENNING with these values
-	public Vector2 get2DSpeedVector() {
+    }
+    public void checkGameEnd()
+    {
+        bool remainingPlayers = isTagger;
+        bool gameEnd = true;
+        foreach (var player in FindObjectsOfType(typeof(Player)) as Player[])
+        {
+            if (remainingPlayers != player.isTagger)
+            { gameEnd = false; }
+        }
+        if (gameEnd) {
+            if (isTagger)
+            {
+                print("red wins!");
+                GameObject red = GameObject.FindGameObjectWithTag("redwins");
+                red.transform.position = new Vector3(0, 1f, -0.4f);
+                gamesettings.nextRound = true;
+                gamesettings.textTimer = 5f;
+            }
+            else {
+                print("blue wins!");
+                gamesettings.nextRound = true;
+                GameObject blue = GameObject.FindGameObjectWithTag("bluewins");
+                blue.transform.position = new Vector3(0, 1f, -0.4f);
+                gamesettings.textTimer = 5f;
+            }
+        }
+
+    }
+
+    //THERE IS SOMETHING STRANGE HAPPENNING with these values
+    public Vector2 get2DSpeedVector() {
 		//if I divide by correct number of frames here it goes wrong if I do it later on it is done correct..
 		float xdiff = (positionsForSpeed[sizeOfSpeedVector-1].x-positionsForSpeed[0].x);
 		float ydiff = (positionsForSpeed[sizeOfSpeedVector-1].y-positionsForSpeed[0].y);
@@ -311,22 +343,22 @@ public class Player : MonoBehaviour {
 		moveVectorK = Vector3.zero;
 		if (Input.GetKey(KeyCode.UpArrow))
 		{
-			moveVectorK.z = 0.1f;
+			moveVectorK.z = 0.2f;
 		}
 		
 		if (Input.GetKey(KeyCode.DownArrow))
 		{
-			moveVectorK.z = -0.1f;
+			moveVectorK.z = -0.2f;
 		}
 
 		if (Input.GetKey(KeyCode.RightArrow))
 		{
-			moveVectorK.x = 0.1f;
+			moveVectorK.x = 0.2f;
 		}
 		
 		if (Input.GetKey(KeyCode.LeftArrow))
 		{
-			moveVectorK.x = -0.1f;
+			moveVectorK.x = -0.2f;
 		}	
 		//this.transform.localPosition = Vector3.Lerp(this.transform.localPosition, this.transform.localPosition+moveVectorK, singleWoozDeltatimeMultiplier*Time.deltaTime);
 	}

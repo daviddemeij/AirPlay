@@ -11,6 +11,7 @@ public class trailScript : MonoBehaviour
     // Fields
     //  
     //************
+    public float removeLoopTime = 1.0f;
     public Transform collisionMeshPrefab;
     [HideInInspector]public GameObject collisionMeshObject;
     [HideInInspector]public GameObject collisionMeshObjectReversed;
@@ -21,13 +22,10 @@ public class trailScript : MonoBehaviour
     public float widthEnd = 1.0f;                   //the ending width of the trail
     public float vertexDistanceMin = 0.10f;         //the minimum distance between the center positions
     public Vector3 renderDirection = new Vector3(0, 0, -1); //the direction that the mesh of the trail will be rendered towards
-    public bool colliderIsTrigger = true;           //determines if the collider is a trigger.  Changing this during runtime will have no effect.
-    public bool colliderEnabled = true;             //determines if the collider is enabled.  Changing this during runtime will have no effect.
     public bool pausing = false;                     //determines if the trail is pausing, i.e. neither creating nor destroying vertices
 
     private Transform trans;                        //transform of the object this script is attached to                    
     private Mesh mesh;
-    private new PolygonCollider2D collider;
 
     private LinkedList<Vector3> centerPositions;    //the previous positions of the object this script is attached to
     private LinkedList<Vertex> leftVertices;        //the left vertices derived from the center positions
@@ -39,36 +37,7 @@ public class trailScript : MonoBehaviour
     //
     //************
 
-    /// <summary>
-    /// Changes the material of the trail during runtime.
-    /// </summary>
-    public void ChangeTrailMaterial(Material material)
-    {
-        trailMaterial = material;
-        collider.GetComponent<Renderer>().material = material;
-    }
-    public bool colliderIsTriggered()
-    {
-        return colliderIsTrigger;
-    }
 
-    /// <summary>
-    /// Changes if the collider is a trigger or not during runtime.
-    /// </summary>
-    public void ChangeColliderTrigger(bool isTrigger)
-    {
-        colliderIsTrigger = isTrigger;
-        collider.isTrigger = isTrigger;
-    }
-
-    /// <summary>
-    /// Changes if the collider is enabled or not during runtime.
-    /// </summary>
-    public void ChangeColliderEnabled(bool enabled)
-    {
-        colliderEnabled = enabled;
-        collider.enabled = enabled;
-    }
 
     //************
     //
@@ -79,15 +48,11 @@ public class trailScript : MonoBehaviour
     private void Awake()
     {
         //create an object and mesh for the trail
-        GameObject trail = new GameObject("Trail", new[] { typeof(MeshRenderer), typeof(MeshFilter), typeof(PolygonCollider2D) });
+        GameObject trail = new GameObject("Trail", new[] { typeof(MeshRenderer), typeof(MeshFilter)});
         mesh = trail.GetComponent<MeshFilter>().mesh = new Mesh();
         trail.GetComponent<Renderer>().material = trailMaterial;
 
-        //get and set the polygon collider on this trail.
-        collider = trail.GetComponent<PolygonCollider2D>();
 
-        collider.isTrigger = colliderIsTrigger;
-        collider.SetPath(0, null);
 
         //get the transform of the object this script is attatched to
         trans = base.transform;
@@ -157,18 +122,15 @@ public class trailScript : MonoBehaviour
                 if (loopVertices.Length != 0)
                 {
                     print("loop object created of length "+loopVertices.Length);
-                    //set the first center position as the current position
+                    // reset the line vector
                     centerPositions = new LinkedList<Vector3>();
-                    //centerPositions.AddFirst(trans.position);
-
                     leftVertices = new LinkedList<Vertex>();
                     rightVertices = new LinkedList<Vertex>();
+                
 
-                    //print("loop: " + loopVertices.Length);
                     collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
                     collisionMeshObject.name = "loopObject";
                     collisionMeshObject.GetComponent<buildMesh>().setVertices(loopVertices);
-                    //collisionMeshObject.AddComponent(MeshCollider).sharedMesh = mesh;
 
                     collisionMeshObjectReversed = Instantiate(collisionMeshPrefab).transform.gameObject;
                     collisionMeshObjectReversed.name = "loopObjectReversed";
@@ -183,6 +145,10 @@ public class trailScript : MonoBehaviour
                             }
                         }
                     }
+                    GameObject.Destroy(collisionMeshObject, removeLoopTime);
+                    GameObject.Destroy(collisionMeshObjectReversed, removeLoopTime);
+                    //GameObject.Destroy(collisionMeshObject, removeLoopTime);
+
                 }
             }
             centerPositions.AddFirst(trans.position);
@@ -307,7 +273,6 @@ public class trailScript : MonoBehaviour
         
         Vector2[] uvs = new Vector2[centerPositions.Count * 2];
         int[] triangles = new int[(centerPositions.Count - 1) * 6];
-        Vector2[] colliderPath = new Vector2[(centerPositions.Count - 1) * 2];
 
         LinkedListNode<Vertex> leftVertNode = leftVertices.First;
         LinkedListNode<Vertex> rightVertNode = rightVertices.First;
@@ -325,10 +290,6 @@ public class trailScript : MonoBehaviour
             int vertIndex = i * 2;
             vertices[vertIndex] = leftVert.Position;
             vertices[vertIndex + 1] = rightVert.Position;
-
-            //collider vertices 
-            colliderPath[i] = leftVert.Position;
-            colliderPath[colliderPath.Length - (i + 1)] = rightVert.Position;
 
             //trail uvs
             float uvValue = leftVert.TimeAlive / timeDelta;
@@ -357,10 +318,7 @@ public class trailScript : MonoBehaviour
         mesh.uv = uvs;
         mesh.triangles = triangles;
 
-        if (colliderEnabled)
-        {
-            collider.SetPath(0, colliderPath);
-        }
+       
     }
 
     //************

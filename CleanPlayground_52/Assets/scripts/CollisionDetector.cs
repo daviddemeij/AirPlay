@@ -2,12 +2,12 @@ using UnityEngine;
 using System.Collections;
 
 public class CollisionDetector : MonoBehaviour {
-
 	Player playerCollider;
 	Player thisPlayer;
-
-	//TODO perhaps generate in shields;
-	public bool inShield;
+    public Transform coinPrefab;
+    private GameObject coin;
+    //TODO perhaps generate in shields;
+    public bool inShield;
 	public bool lastInShield;
 
 	//select some simple audio files to play upon collision
@@ -16,7 +16,7 @@ public class CollisionDetector : MonoBehaviour {
 	
 	private Logger loggerScript;
 	private GameObject mainCameraObject;
-
+    private float coinCountdown = 1.0f;
 	// Use this for initialization
 	void Start () {
 		mainCameraObject = GameObject.FindGameObjectWithTag("MainCamera");
@@ -26,8 +26,8 @@ public class CollisionDetector : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        coinCountdown -= Time.deltaTime;
+    }
 
 	void OnTriggerEnter(Collider myTrigger)
 	{
@@ -39,18 +39,26 @@ public class CollisionDetector : MonoBehaviour {
         if (myTrigger.gameObject.transform.parent != null && myTrigger.gameObject.transform.parent.tag == "Player")
 		{ 
 			GameObject playercollision = myTrigger.transform.parent.gameObject;
-			string triggername = myTrigger.gameObject.transform.name;
+			string triggername = myTrigger.gameObject.transform.parent.name;
 			playSound();
 			print ("debug line " + triggername);
-            if (thisPlayer.isTagger) { myTrigger.gameObject.transform.parent.GetComponent<Player>().isTagger = true; }
+            if (thisPlayer.isTagger)
+            {
+                if (thisPlayer.powerUpCounter >= thisPlayer.taggerMat.Length-1)
+                {
+                    myTrigger.gameObject.transform.parent.GetComponent<Player>().isTagger = true;
+                    thisPlayer.powerUpCounter = 0;
+                    thisPlayer.updateTaggerMaterial();
+                }
+            }
 
             
         }
 		//powerUpOrbit , powerUpScaleDown, powerUpScaleUp, powerUpShield
 		else 
 		{
-			string triggername = myTrigger.gameObject.transform.name;
-            print(triggername+" triggers "+thisPlayer.name);
+			string triggertag = myTrigger.gameObject.transform.tag;
+            print("Trigger: " + triggertag);
 			//GameObject powerUpObject = myTrigger.gameObject;
 			//GameObject parentOfPU = powerUpObject.transform.parent.gameObject;
 			//only if you are a runner you can collect the particles
@@ -60,13 +68,18 @@ public class CollisionDetector : MonoBehaviour {
             //{
             ///    if (thisPlayer.isTagger) { thisPlayer.isTagger = false; }
             //}
-			if (triggername == "particleCollider")
-			{
-				if(!GetComponent<AudioSource>().isPlaying) 
-				{ 
-					playPowerUpSound(0);
-				}
-			}
+            if(triggertag == "Coin" && thisPlayer.isTagger && coinCountdown<=0)
+            {
+                print("pickup coin by " + thisPlayer.name);
+                //GameObject.Destroy(myTrigger.gameObject);
+                playPowerUpSound(0);
+                thisPlayer.powerUpCounter++;
+                thisPlayer.updateTaggerMaterial();
+                //coin = Instantiate(coinPrefab).transform.gameObject;
+                myTrigger.transform.position = new Vector3(Random.Range(1.0f, 2f), 0, Random.Range(-1.3f, -1.8f));
+                //coinCountdown = 1.0f;
+            }
+		
 		}
 	}
 
