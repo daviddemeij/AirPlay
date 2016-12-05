@@ -26,6 +26,7 @@ public class KeyHandling : MonoBehaviour {
 	CalibrationOfPlayground calibrationScript;
 	KinectRigClient kinectRigClientScript;
 	Wooz woozScript;
+    GameSettings gameSettingsScript;
 
 	//allows a Wizard of Oz player to move quicker
 	bool speedAdapt = false;
@@ -37,7 +38,7 @@ public class KeyHandling : MonoBehaviour {
 	void Start () {
 		calibrationScript = this.GetComponent("CalibrationOfPlayground") as CalibrationOfPlayground;
 		woozScript = this.GetComponent("Wooz") as Wooz;
-
+        gameSettingsScript = this.GetComponent<GameSettings>();
 		//We ORDER when this script will be run/done 
 		//This script has to be done after the main kinectrig
 		kinectRigClientScript = this.GetComponent("KinectRigClient") as KinectRigClient;
@@ -55,6 +56,7 @@ public class KeyHandling : MonoBehaviour {
 
 	//TODO in Wooz script there are also some keyhandling settings left
 	void handleKeySettings(){
+        
         if (Input.GetKeyUp(KeyCode.R)){
 
             SceneManager.LoadScene("simplifiedTrackerGame");

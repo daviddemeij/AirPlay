@@ -68,7 +68,6 @@ public class Wooz : MonoBehaviour {
 			//TODO make it only dependent on this script, dont allow movement in tagplayer with moveTo if it is in WOOZ mode
 			for(int i=0;i<playersWooz.Length;i++)
 			{
-				Debug.Log (" i  is" + i);
 				playerScript = playersWooz[i].GetComponent("Player") as Player;
 				playerScript.woozIsOn = woozGame;
 			}

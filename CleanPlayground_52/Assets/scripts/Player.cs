@@ -5,8 +5,8 @@ public class Player : MonoBehaviour {
     public bool isTagger;
     public bool freezed;
     public int powerUpCounter = 0;
-    public Material runnerMat;
-    public Material[] taggerMat;
+    public Texture runnerTexture;
+    public Texture[] taggerTexture;
     [HideInInspector]public bool currentMatTagger = false;
 
     //[HideInInspector]public GameObject[] lines;
@@ -30,8 +30,10 @@ public class Player : MonoBehaviour {
 	public bool woozIsOn =false;
 	public bool singleWoozPlayer;
 	public float singleWoozDeltatimeMultiplier = 100.0f; //changes the speed with which the wooz player is moved
-
-
+    private GameObject flame;
+    private GameObject smoke;
+    private GameObject innerFire;
+    private GameObject outerFire;
     //TODO re add moveVectorK it was used for the wooz
     Vector3 moveVectorK;
 
@@ -48,12 +50,22 @@ public class Player : MonoBehaviour {
 
 	private Logger loggerScript;
 	private GameObject backgroundImageObject;
-    public trailScript trailscript;
-    public GameSettings gamesettings;
+    private trailScript trailscript;
+    private gameStateChecker gameStateCheckerScript;
+    private texture_animation textureAnimationScript;
+
     // Use this for initialization
     void Start () {
-        
+        flame = this.transform.GetChild(1).gameObject;
+        innerFire = flame.transform.GetChild(0).gameObject;
+        outerFire = flame.transform.GetChild(1).gameObject;
+        smoke = flame.transform.GetChild(2).gameObject;
         trailscript = this.GetComponent<trailScript>();
+        mainCameraObject = GameObject.FindGameObjectWithTag("MainCamera");
+        gameStateCheckerScript = mainCameraObject.GetComponent<gameStateChecker>();
+        loggerScript = mainCameraObject.GetComponent("Logger") as Logger;
+        textureAnimationScript = this.GetComponent<texture_animation>();
+
         updateTaggerMaterial();
         
         //buildMesh missileCopy = Instantiate<buildMesh>(missile);
@@ -61,13 +73,7 @@ public class Player : MonoBehaviour {
 
         //average speed over 5 frames
         initiatePositionVector();
-
-    //be able to switch the background if something happends
-        backgroundImageObject = GameObject.FindGameObjectWithTag("BackgroundImage");
-		mainCameraObject = GameObject.FindGameObjectWithTag("MainCamera");
-        gamesettings = mainCameraObject.GetComponent<GameSettings>();
-
-		loggerScript = mainCameraObject.GetComponent("Logger") as Logger;
+;
 
 		startPosition = this.gameObject.transform.position;
 
@@ -222,18 +228,42 @@ public class Player : MonoBehaviour {
 			positionsForSpeed[i] = positionsForSpeed[0];
 		}
 	}
+    public void resetPlayer()
+    {
+        trailscript.resetTrail();
+        powerUpCounter = 0;
+        updateTaggerMaterial();
+        print("reset player is called");
+    }
     public void updateTaggerMaterial()
     {
         if (isTagger)
         {
             currentMatTagger = true;
-            if (powerUpCounter > taggerMat.Length-1)
+            if (powerUpCounter >= taggerTexture.Length-1)
             {
-                this.GetComponent<Renderer>().material = taggerMat[taggerMat.Length-1];
+                this.GetComponent<Renderer>().material.mainTexture = taggerTexture[taggerTexture.Length-1];
+                innerFire.SetActive(true);
+                outerFire.SetActive(true);
+                textureAnimationScript.setColumns(1);
+
             }
             else
             {
-                this.GetComponent<Renderer>().material = taggerMat[powerUpCounter];
+                 innerFire.SetActive(false);
+                 outerFire.SetActive(false);
+                
+                this.GetComponent<Renderer>().material.mainTexture = taggerTexture[powerUpCounter];
+                if (powerUpCounter >= taggerTexture.Length - 2)
+                {
+                    smoke.SetActive(true);
+                    textureAnimationScript.setColumns(4);
+                }
+                else
+                {
+                    textureAnimationScript.setColumns(6);
+                    smoke.SetActive(false);
+                }
             }
             
             trailscript.enabled = false;
@@ -241,8 +271,12 @@ public class Player : MonoBehaviour {
         else
         {
             currentMatTagger = false;
-            this.GetComponent<Renderer>().material = runnerMat;
+            this.GetComponent<Renderer>().material.mainTexture = runnerTexture;
             trailscript.enabled = true;
+            innerFire.SetActive(false);
+            outerFire.SetActive(false);
+            smoke.SetActive(false);
+            textureAnimationScript.setColumns(1);
         }
 
     }
@@ -259,17 +293,11 @@ public class Player : MonoBehaviour {
             if (isTagger)
             {
                 print("red wins!");
-                GameObject red = GameObject.FindGameObjectWithTag("redwins");
-                red.transform.position = new Vector3(0, 1f, -0.4f);
-                gamesettings.nextRound = true;
-                gamesettings.textTimer = 5f;
+                gameStateCheckerScript.redWins();
             }
             else {
                 print("blue wins!");
-                gamesettings.nextRound = true;
-                GameObject blue = GameObject.FindGameObjectWithTag("bluewins");
-                blue.transform.position = new Vector3(0, 1f, -0.4f);
-                gamesettings.textTimer = 5f;
+                gameStateCheckerScript.blueWins();
             }
         }
 
@@ -285,20 +313,9 @@ public class Player : MonoBehaviour {
 	}
 
 	private void updatePositionVector(Vector3 latestPosition) {
-//		if (getIsTagger())
-//		{	
-//			print("last pos" + latestPosition + " get2DSpeedVector" + get2DSpeedVector() + "pos0" + positionsForSpeed[0] + "last" + positionsForSpeed[sizeOfSpeedVector-1] );
-//		}
-
 		for (int i=0;i<positionsForSpeed.Length-1;i++)
 	    {
 			positionsForSpeed[i] = positionsForSpeed[i+1];
-//			positionsForSpeed[0] = positionsForSpeed[1];
-//			positionsForSpeed[1] = positionsForSpeed[2];
-//			positionsForSpeed[2] = positionsForSpeed[3];
-//			positionsForSpeed[3] = positionsForSpeed[4];
-//			positionsForSpeed[4].x = latestPosition.x;
-//			positionsForSpeed[4].y = latestPosition.z;
 		}
 		positionsForSpeed[positionsForSpeed.Length-1].x = latestPosition.x;
 		positionsForSpeed[positionsForSpeed.Length-1].y = latestPosition.z;
