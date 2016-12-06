@@ -9,8 +9,7 @@ public class GameSettings : MonoBehaviour
     public int nrOftaggers = 1;
     public List<int> taggers;
     public float textTimer = 0;
-    public Texture blueWinsTexture;
-    public Texture redWinsTexture;
+    public Material[] trailMaterial;
     //we need to use a woozscript;
     Wooz woozScript;
 
@@ -25,13 +24,13 @@ public class GameSettings : MonoBehaviour
     public Transform playerPrefab;
     Vector3 startPositionOfFirstPlayer = new Vector3(0.8f, 0.0f, -0.41f);
     [HideInInspector]public Vector3 stageDimensions;
-    gameStateChecker gameStateCheckerScript;
+
     private GameObject backgroundImageObject;
 
     // Use this for initialization
     void Start()
     {
-        gameStateCheckerScript = this.GetComponent<gameStateChecker>();
+
         stageDimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, Screen.height));
         print(stageDimensions.x + " x " + stageDimensions.y + " y " + stageDimensions.z + " z ");
         //loadplayers based on the number of player objects that are in the scene
@@ -73,8 +72,12 @@ public class GameSettings : MonoBehaviour
             {
 
                 gameObj.GetComponent<Player>().resetPlayer();
-                if (taggers.Contains(i)) { gameObj.GetComponent<Player>().isTagger = true; }
+
+                if (taggers.Contains(i)) {
+                    gameObj.GetComponent<Player>().isTagger = true;
+                }
                 else { gameObj.GetComponent<Player>().isTagger = false; }
+                gameObj.GetComponent<Player>().trailMaterial = trailMaterial[i % trailMaterial.Length];
                 i++;
             }
             nextRound = false;
@@ -134,10 +137,14 @@ public class GameSettings : MonoBehaviour
                 //this is extra precaution that shouldn't be needed
                 if (i < playerGameObjects.Length)
                 {
-                
+                    //   if (i > 0)
+                    // { playerGameObjects[i].GetComponent<trailScript>().trail.GetComponent<Renderer>().material = trailMaterial[i%trailMaterial.Length]; }
+
                     //assign the script to vector of players which we will use in the rest of the game and scripts
-                    playerGameObjects[i] = gameObj.transform.gameObject;
                     
+                    playerGameObjects[i] = gameObj.transform.gameObject;
+                    playerGameObjects[i].GetComponent<Player>().trailMaterial = trailMaterial[i % trailMaterial.Length];
+
                     //set the id of the players once
                     playerScript = playerGameObjects[i].GetComponent("Player") as Player;
                     playerScript.id = i;

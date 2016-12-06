@@ -59,7 +59,7 @@ public class KeyHandling : MonoBehaviour {
         
         if (Input.GetKeyUp(KeyCode.R)){
 
-            SceneManager.LoadScene("simplifiedTrackerGame");
+            SceneManager.LoadScene("airplay");
         }
 				
 		if (Input.GetKeyUp(KeyCode.C))

@@ -23,7 +23,6 @@ public class trailScript : MonoBehaviour
     public float vertexDistanceMin = 0.10f;         //the minimum distance between the center positions
     public Vector3 renderDirection = new Vector3(0, 0, -1); //the direction that the mesh of the trail will be rendered towards
     public bool pausing = false;                     //determines if the trail is pausing, i.e. neither creating nor destroying vertices
-    public int id;
     private Transform trans;                        //transform of the object this script is attached to                    
     private Mesh mesh;
 
@@ -47,7 +46,7 @@ public class trailScript : MonoBehaviour
 
     private void Awake()
     {
-        //id = this.gameObject.GetComponentInParent<Player>().id;
+  
         //create an object and mesh for the trail
         trail = new GameObject("Trail", new[] { typeof(MeshRenderer), typeof(MeshFilter)});
         mesh = trail.GetComponent<MeshFilter>().mesh = new Mesh();
@@ -125,7 +124,7 @@ public class trailScript : MonoBehaviour
                 {
                     print("loop object created of length "+loopVertices.Length);
                     // reset the line vector
-                    resetTrail();
+                    resetTrail(trail.GetComponent<Renderer>().material);
                     
                 
 
@@ -265,7 +264,7 @@ public class trailScript : MonoBehaviour
     private void SetMesh()
     {
         //only continue if there are at least two center positions in the collection
-        if (centerPositions.Count < 2)
+        if (centerPositions.Count < 2 || leftVertices.Count<=1)
         {
             return;
         }
@@ -280,7 +279,9 @@ public class trailScript : MonoBehaviour
         LinkedListNode<Vertex> rightVertNode = rightVertices.First;
 
         //get the change in time between the first and last pair of vertices
-        float timeDelta = leftVertices.Last.Value.TimeAlive - leftVertices.First.Value.TimeAlive;
+        
+       float timeDelta = leftVertices.Last.Value.TimeAlive - leftVertices.First.Value.TimeAlive;
+        
 
         //iterate through all the pairs of vertices (left + right)
         for (int i = 0; i < leftVertices.Count; ++i)
@@ -323,13 +324,13 @@ public class trailScript : MonoBehaviour
        
     }
 
-    public void resetTrail()
+    public void resetTrail(Material trailMaterialPlayer)
     {
         GameObject.Destroy(trail.gameObject);
 
         trail = new GameObject("Trail", new[] { typeof(MeshRenderer), typeof(MeshFilter) });
         mesh = trail.GetComponent<MeshFilter>().mesh = new Mesh();
-        trail.GetComponent<Renderer>().material = trailMaterial;
+        trail.GetComponent<Renderer>().material = trailMaterialPlayer;
 
 
 
@@ -343,7 +344,6 @@ public class trailScript : MonoBehaviour
         leftVertices = new LinkedList<Vertex>();
         rightVertices = new LinkedList<Vertex>();
         LinkedListNode<Vertex> leftVertNode = leftVertices.Last;
-        
     }
     //************
     //

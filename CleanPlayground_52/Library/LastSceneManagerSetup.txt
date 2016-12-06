@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_Scenes/simplifiedTrackerGame.unity
+- path: Assets/airplay.unity
   isLoaded: 1
   isActive: 1

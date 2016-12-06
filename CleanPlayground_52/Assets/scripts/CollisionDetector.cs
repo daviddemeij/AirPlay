@@ -13,7 +13,7 @@ public class CollisionDetector : MonoBehaviour {
 	public AudioClip[] a_powerUpSounds; 
 	public AudioClip[] a_tagSounds; //burn, a_coin, a_coinsDown, a_coinsUp, a_drunk, a_growing, a_shield, a_shrink;
 	
-	private Logger loggerScript;
+
 	private GameObject mainCameraObject;
     private float coinCountdown = 1.0f;
     private gameStateChecker gameState;
@@ -22,7 +22,7 @@ public class CollisionDetector : MonoBehaviour {
 	void Start () {
 		mainCameraObject = GameObject.FindGameObjectWithTag("MainCamera");
 
-		loggerScript = mainCameraObject.GetComponent("Logger") as Logger;
+
         gameSettingsScript = mainCameraObject.GetComponent("GameSettings") as GameSettings;
         gameState = mainCameraObject.GetComponent("gameStateChecker") as gameStateChecker;
         thisPlayer = this.transform.parent.GetComponent("Player") as Player;
