@@ -22,21 +22,23 @@ public class KeyHandling : MonoBehaviour {
 	public int calibrationID = 0;	
 	//indicates whether the game is calibration mode or not
 	private bool calibration = false;
-
-	CalibrationOfPlayground calibrationScript;
+    private GameObject Movie;
+    CalibrationOfPlayground calibrationScript;
 	KinectRigClient kinectRigClientScript;
 	Wooz woozScript;
     GameSettings gameSettingsScript;
 
 	//allows a Wizard of Oz player to move quicker
 	bool speedAdapt = false;
-
+    public bool isInstruction = false;
 	//this is problematic as it hast to be loaded from the kinectrig where it is loaded during start as well;
 	[HideInInspector] public GameObject[] playerGameObjects;
 
 	// Use this for initialization
 	void Start () {
-		calibrationScript = this.GetComponent("CalibrationOfPlayground") as CalibrationOfPlayground;
+        Movie = GameObject.Find("MoviePlane");
+        Movie.SetActive(false);
+        calibrationScript = this.GetComponent("CalibrationOfPlayground") as CalibrationOfPlayground;
 		woozScript = this.GetComponent("Wooz") as Wooz;
         gameSettingsScript = this.GetComponent<GameSettings>();
 		//We ORDER when this script will be run/done 
@@ -61,8 +63,25 @@ public class KeyHandling : MonoBehaviour {
 
             SceneManager.LoadScene("airplay");
         }
-				
-		if (Input.GetKeyUp(KeyCode.C))
+        if (Input.GetKeyUp(KeyCode.I))
+        {
+            if (isInstruction)
+            {
+                isInstruction = false;
+               
+                Movie.GetComponent<movieScript>().stopInstruction();
+                Movie.SetActive(false);
+            }
+            else
+            {
+                isInstruction = true;
+                Movie.SetActive(true);
+                Movie.GetComponent<movieScript>().playInstruction();
+            }  
+        }
+
+
+        if (Input.GetKeyUp(KeyCode.C))
 		{
 			calibration = !calibration;
 			calibrationScript.calibration = calibration; 

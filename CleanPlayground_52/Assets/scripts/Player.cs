@@ -91,9 +91,6 @@ public class Player : MonoBehaviour
         //keep track of last update time, be able to show and hide players based on this
         lastUpdateTime = Time.realtimeSinceStartup;
         lastDurationUpdateTime = 1.0f / 25.0f; //approximate framerate
-
-
-
     }
 
     // Update is called once per frame
@@ -102,7 +99,7 @@ public class Player : MonoBehaviour
         // Set right material based on who is the tagger
         if (isTagger && !currentMatTagger)
         {
-            print("currentmattagger " + currentMatTagger);
+
             updateTaggerMaterial();
             checkGameEnd();
 
@@ -246,58 +243,57 @@ public class Player : MonoBehaviour
         updateTaggerMaterial();
         print("reset player is called");
     }
+    
     public void updateTaggerMaterial()
     {
-        if (isTagger)
-        {
-            innerIce.SetActive(false);
-            outerIce.SetActive(false);
-            currentMatTagger = true;
-            if (powerUpCounter >= taggerTexture.Length - 1)
+            if (isTagger)
             {
-                this.GetComponent<Renderer>().material.mainTexture = taggerTexture[taggerTexture.Length - 1];
-                innerFire.SetActive(true);
-                outerFire.SetActive(true);
-
-                textureAnimationScript.setColumns(1);
-
-            }
-            else
-            {
-                innerFire.SetActive(false);
-                outerFire.SetActive(false);
-
-
-                this.GetComponent<Renderer>().material.mainTexture = taggerTexture[powerUpCounter];
-                if (powerUpCounter >= taggerTexture.Length - 2)
+                innerIce.SetActive(false);
+                outerIce.SetActive(false);
+                currentMatTagger = true;
+                if (powerUpCounter >= taggerTexture.Length - 1)
                 {
-                    smoke.SetActive(true);
-                    textureAnimationScript.setColumns(4);
+                    this.GetComponent<Renderer>().material.mainTexture = taggerTexture[taggerTexture.Length - 1];
+                    innerFire.SetActive(true);
+                    outerFire.SetActive(true);
+
+                    textureAnimationScript.setColumns(1);
+
                 }
                 else
                 {
-                    textureAnimationScript.setColumns(6);
-                    smoke.SetActive(false);
+                    innerFire.SetActive(false);
+                    outerFire.SetActive(false);
+
+
+                    this.GetComponent<Renderer>().material.mainTexture = taggerTexture[powerUpCounter];
+                    if (powerUpCounter >= taggerTexture.Length - 2)
+                    {
+                        smoke.SetActive(true);
+                        textureAnimationScript.setColumns(4);
+                    }
+                    else
+                    {
+                        textureAnimationScript.setColumns(6);
+                        smoke.SetActive(false);
+                    }
                 }
+
+                trailscript.enabled = false;
             }
-
-            trailscript.enabled = false;
-        }
-        else
-        {
-            currentMatTagger = false;
-            this.GetComponent<Renderer>().material.mainTexture = runnerTexture;
-            trailscript.enabled = true;
-            trailscript.trail.GetComponent<Renderer>().material = trailMaterial;
-            innerFire.SetActive(false);
-            outerFire.SetActive(false);
-            smoke.SetActive(false);
-            innerIce.SetActive(true);
-            outerIce.SetActive(true);
-
-            textureAnimationScript.setColumns(1);
-        }
-
+            else
+            {
+                currentMatTagger = false;
+                this.GetComponent<Renderer>().material.mainTexture = runnerTexture;
+                trailscript.enabled = true;
+                trailscript.trail.GetComponent<Renderer>().material = trailMaterial;
+                innerFire.SetActive(false);
+                outerFire.SetActive(false);
+                smoke.SetActive(false);
+                innerIce.SetActive(true);
+                outerIce.SetActive(true);
+                textureAnimationScript.setColumns(1);
+            }
     }
     public void checkGameEnd()
     {

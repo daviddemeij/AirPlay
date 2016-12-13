@@ -4,6 +4,7 @@ using System.Collections;
 public class gameStateChecker : MonoBehaviour {
     [HideInInspector]public bool IsCountdown = true;
     [HideInInspector]public bool isAnnounceWinner = false;
+    [HideInInspector]public bool isInstruction = false;
     public Texture[] countdownTexture = new Texture[4];
     public AudioClip countdownAudio;
     public Texture gameBackground;

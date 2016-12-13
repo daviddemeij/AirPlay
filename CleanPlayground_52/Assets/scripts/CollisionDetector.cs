@@ -12,20 +12,17 @@ public class CollisionDetector : MonoBehaviour {
 	//select some simple audio files to play upon collision
 	public AudioClip[] a_powerUpSounds; 
 	public AudioClip[] a_tagSounds; //burn, a_coin, a_coinsDown, a_coinsUp, a_drunk, a_growing, a_shield, a_shrink;
-	
+
 
 	private GameObject mainCameraObject;
     private float coinCountdown = 1.0f;
-    private gameStateChecker gameState;
-    private GameSettings gameSettingsScript; 
+    private gameStateChecker gameState; 
 	// Use this for initialization
 	void Start () {
 		mainCameraObject = GameObject.FindGameObjectWithTag("MainCamera");
-
-
-        gameSettingsScript = mainCameraObject.GetComponent("GameSettings") as GameSettings;
         gameState = mainCameraObject.GetComponent("gameStateChecker") as gameStateChecker;
         thisPlayer = this.transform.parent.GetComponent("Player") as Player;
+
 	}
 	
 	// Update is called once per frame
@@ -35,7 +32,7 @@ public class CollisionDetector : MonoBehaviour {
 
 	void OnTriggerEnter(Collider myTrigger)
 	{
-        if (gameState != null && myTrigger != null)
+        if (gameState != null && myTrigger != null )
         {
             if (!gameState.IsCountdown && !gameState.isAnnounceWinner)
             {
@@ -48,7 +45,6 @@ public class CollisionDetector : MonoBehaviour {
                 if (myTrigger.gameObject.transform.parent != null && myTrigger.gameObject.transform.parent.tag == "Player")
                 {
                     GameObject playerCollision = myTrigger.transform.parent.gameObject;
-                    string triggername = playerCollision.name;
                     playSound();
 
                     if (thisPlayer.isTagger && !playerCollision.GetComponent<Player>().isTagger)

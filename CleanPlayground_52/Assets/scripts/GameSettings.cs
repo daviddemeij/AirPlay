@@ -24,9 +24,10 @@ public class GameSettings : MonoBehaviour
     public Transform playerPrefab;
     Vector3 startPositionOfFirstPlayer = new Vector3(0.8f, 0.0f, -0.41f);
     [HideInInspector]public Vector3 stageDimensions;
-
+    private GameObject coin1;
+    private GameObject coin2;
     private GameObject backgroundImageObject;
-
+    public bool isPause = false;
     // Use this for initialization
     void Start()
     {
@@ -44,9 +45,12 @@ public class GameSettings : MonoBehaviour
         woozScript.loadedGameObjects = false;
         //assigns the gameobjects and later on assigns the scripts
         woozScript.AssignPlayerGameObjects(playerGameObjects);
+        coin1 = GameObject.Find("Coin 1");
+        coin2 = GameObject.Find("Coin 2");
     }
 
     // Update is called once per frame
+    
     void Update()
     { 
         
@@ -86,6 +90,7 @@ public class GameSettings : MonoBehaviour
 
     }
 
+  
     //we loadplayers based on the scene
     void LoadPlayers()
     {
@@ -103,13 +108,11 @@ public class GameSettings : MonoBehaviour
         int randomTagger;
         while (nrTaggersRemaining > 0)
         {
-            print("taggers remaining" + nrTaggersRemaining);
             randomTagger = Mathf.RoundToInt(Random.Range(0, nrOfPlayers - 1));
             if (!taggers.Contains(randomTagger))
             {
                 taggers.Add(randomTagger);
                 nrTaggersRemaining--;
-                print("tagger:" + randomTagger);
             }
         }
         Transform lastCreatedPlayer;
