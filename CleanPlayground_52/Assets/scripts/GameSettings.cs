@@ -6,7 +6,7 @@ public class GameSettings : MonoBehaviour
 {
     public bool nextRound = true;
     public int nrOfPlayers = 0;
-    public int nrOftaggers = 1;
+    public int nrOftaggers = 0;
     public List<int> taggers;
     public float textTimer = 0;
     public Material[] trailMaterial;
