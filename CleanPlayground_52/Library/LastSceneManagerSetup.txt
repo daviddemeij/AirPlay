@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_Scenes/Interface.unity
+- path: Assets/_Scenes/airplay.unity
   isLoaded: 1
   isActive: 1

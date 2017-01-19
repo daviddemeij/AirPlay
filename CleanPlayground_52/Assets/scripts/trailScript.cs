@@ -13,9 +13,11 @@ public class trailScript : MonoBehaviour
     //************
     public float removeLoopTime = 1.0f;
     public Transform collisionMeshPrefab;
+    public Transform collisionMeshFirePrefab;
     [HideInInspector]public GameObject collisionMeshObject;
     [HideInInspector]public GameObject collisionMeshObjectReversed;
     public Material trailMaterial;                  //the material of the trail.  Changing this during runtime will have no effect.
+
     public float lifeTime = 1.0f;                   //the amount of time in seconds that the trail lasts
     public float changeTime = 0.5f;                 //time point when the trail begins changing its width (if widthStart != widthEnd)
     public float widthStart = 1.0f;                 //the starting width of the trail
@@ -30,6 +32,8 @@ public class trailScript : MonoBehaviour
     private LinkedList<Vertex> leftVertices;        //the left vertices derived from the center positions
     private LinkedList<Vertex> rightVertices;       //the right vertices derived from the center positions
     public GameObject trail;
+
+    Player playerscript;
     //************
     //
     // Public Methods
@@ -52,8 +56,8 @@ public class trailScript : MonoBehaviour
         mesh = trail.GetComponent<MeshFilter>().mesh = new Mesh();
         trail.GetComponent<Renderer>().material = trailMaterial;
 
-
-
+        playerscript = base.GetComponent<Player>();
+        
         //get the transform of the object this script is attatched to
         trans = base.transform;
 
@@ -67,6 +71,7 @@ public class trailScript : MonoBehaviour
 
     private void Update()
     {
+
         if (!pausing)
         {
             //set the mesh and adjust widths if vertices were added or removed
@@ -125,23 +130,39 @@ public class trailScript : MonoBehaviour
                     print("loop object created of length "+loopVertices.Length);
                     // reset the line vector
                     resetTrail(trail.GetComponent<Renderer>().material);
-                    
-                
-
-                    collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
+                    if (playerscript.isTagger)
+                    {
+                        collisionMeshObject = Instantiate(collisionMeshFirePrefab).transform.gameObject;
+                        collisionMeshObjectReversed = Instantiate(collisionMeshFirePrefab).transform.gameObject;
+                    }
+                    else
+                    {
+                        collisionMeshObject = Instantiate(collisionMeshPrefab).transform.gameObject;
+                        collisionMeshObjectReversed = Instantiate(collisionMeshPrefab).transform.gameObject;
+                    }
                     collisionMeshObject.name = "loopObject";
                     collisionMeshObject.GetComponent<buildMesh>().setVertices(loopVertices);
 
-                    collisionMeshObjectReversed = Instantiate(collisionMeshPrefab).transform.gameObject;
+                    
                     collisionMeshObjectReversed.name = "loopObjectReversed";
                     collisionMeshObjectReversed.GetComponent<buildMesh>().setVertices(loopVerticesReversed);
                     foreach (var gameObj in FindObjectsOfType(typeof(Player)) as Player[])
                     {
-                        if (gameObj.isTagger)
+                        if (playerscript.id != gameObj.id)
                         {
-                            if (collisionMeshObject.GetComponent<MeshCollider>().bounds.Contains(gameObj.transform.position))
+                            if (!playerscript.isTagger && gameObj.isTagger)
                             {
-                                gameObj.isTagger = false;
+                                if (collisionMeshObject.GetComponent<MeshCollider>().bounds.Contains(gameObj.transform.position))
+                                {
+                                    gameObj.isTagger = false;
+                                }
+                            }
+                            else if (playerscript.isTagger && !gameObj.isTagger)
+                            {
+                                if (collisionMeshObject.GetComponent<MeshCollider>().bounds.Contains(gameObj.transform.position))
+                                {
+                                    gameObj.isTagger = true;
+                                }
                             }
                         }
                     }
@@ -332,8 +353,7 @@ public class trailScript : MonoBehaviour
         mesh = trail.GetComponent<MeshFilter>().mesh = new Mesh();
         trail.GetComponent<Renderer>().material = trailMaterialPlayer;
 
-
-
+        
         //get the transform of the object this script is attatched to
         trans = base.transform;
 

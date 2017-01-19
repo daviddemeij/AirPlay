@@ -6,7 +6,9 @@ public class CollisionDetector : MonoBehaviour {
 	Player thisPlayer;
     public Transform coinPrefab;
     private GameObject coin;
-    //TODO perhaps generate in shields;
+    public Transform iceCoinPrefab;
+    private GameObject iceCoin;
+
 
 
 	//select some simple audio files to play upon collision
@@ -60,7 +62,7 @@ public class CollisionDetector : MonoBehaviour {
 
 
                 }
-                //powerUpOrbit , powerUpScaleDown, powerUpScaleUp, powerUpShield
+
                 else
                 {
                     string triggertag = myTrigger.gameObject.transform.tag;
@@ -69,39 +71,15 @@ public class CollisionDetector : MonoBehaviour {
                         playPowerUpSound(0);
                         thisPlayer.powerUpCounter++;
                         thisPlayer.updateTaggerMaterial();
-                        //coin = Instantiate(coinPrefab).transform.gameObject;
-
-                        //GameObject otherCoin;
-                        //if(myTrigger.name == "Coin 1")
-                        //{
-                          //  otherCoin = GameObject.Find("Coin 2");
-                        //}
-                        //else
-                        //{
-                          ///  otherCoin = GameObject.Find("Coin 1");
-                        //}
-
                         
-
-                        //Vector2 positionOtherCoin;
-                        //positionOtherCoin = new Vector2(otherCoin.transform.position.x, otherCoin.transform.position.z);
-
-
-                        //Vector2 positionPlayer;
-                        //positionPlayer = new Vector2(thisPlayer.transform.position.x, thisPlayer.transform.position.z);
-                        //Vector2 randomNumbers;
-                        //randomNumbers = new Vector2(otherCoin.transform.position.x, otherCoin.transform.position.z);
-                        //print(positionOtherCoin.x);
-
-
-                        //while ((positionOtherCoin - randomNumbers).sqrMagnitude < 7f && (positionPlayer - randomNumbers).sqrMagnitude < 7f)
-                        //{
-                            //print((positionOtherCoin - randomNumbers).sqrMagnitude);
-                            //randomNumbers.x = Random.Range(0.5f, gameSettingsScript.stageDimensions.x - 0.5f);
-                          //  randomNumbers.y = Random.Range(gameSettingsScript.stageDimensions.z + 0.5f, -0.5f);
-                        //}
-                            myTrigger.transform.position = new Vector3(Random.Range(0.65f,2.95f), 0, Random.Range(-3.1f, -0.2f));
-                        //coinCountdown = 1.0f;
+                         myTrigger.transform.position = new Vector3(Random.Range(0.65f,2.95f), 0, Random.Range(-3.1f, -0.2f));
+                    }
+                    if (triggertag == "IceCoin" && !thisPlayer.isTagger && coinCountdown <= 0)
+                    {
+                        playPowerUpSound(0);
+                        thisPlayer.powerUpCounter++;
+                        thisPlayer.updateTaggerMaterial();
+                        myTrigger.transform.position = new Vector3(Random.Range(0.65f, 2.95f), 0, Random.Range(-3.1f, -0.2f));
                     }
 
                 }

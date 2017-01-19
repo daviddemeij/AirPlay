@@ -4,10 +4,12 @@ using System.Collections;
 public class Player : MonoBehaviour
 {
     public bool isTagger;
+    private bool bothTrail;
     public int powerUpCounter = 0;
     public Texture runnerTexture;
     public Texture[] taggerTexture;
     public Material trailMaterial;
+    public Material trailMaterialTagger;
     [HideInInspector]
     public bool currentMatTagger = false;
 
@@ -57,6 +59,7 @@ public class Player : MonoBehaviour
 
     private GameObject backgroundImageObject;
     private trailScript trailscript;
+    private GameSettings gameSettingsScript;
     private gameStateChecker gameStateCheckerScript;
     private texture_animation textureAnimationScript;
 
@@ -72,7 +75,8 @@ public class Player : MonoBehaviour
         trailscript = this.GetComponent<trailScript>();
         mainCameraObject = GameObject.FindGameObjectWithTag("MainCamera");
         gameStateCheckerScript = mainCameraObject.GetComponent<gameStateChecker>();
-
+        gameSettingsScript = mainCameraObject.GetComponent<GameSettings>();
+        bothTrail = gameSettingsScript.BothTrail;
         textureAnimationScript = this.GetComponent<texture_animation>();
 
         updateTaggerMaterial();
@@ -99,16 +103,13 @@ public class Player : MonoBehaviour
         // Set right material based on who is the tagger
         if (isTagger && !currentMatTagger)
         {
-
             updateTaggerMaterial();
             checkGameEnd();
-
         }
         else if (!isTagger && currentMatTagger) // if the player is not the tagger, but the used material is of the tagger -> change material
         {
             updateTaggerMaterial();
             checkGameEnd();
-
         }
 
         //WoozPlayer are wooz of oz players, we switch between normal server controlled players and wooz with pressing W in the game
@@ -238,7 +239,15 @@ public class Player : MonoBehaviour
     }
     public void resetPlayer()
     {
-        trailscript.resetTrail(trailMaterial);
+        if (bothTrail && isTagger)
+        {
+            trailscript.resetTrail(trailMaterialTagger);
+        }
+        else
+        {
+            trailscript.resetTrail(trailMaterial);
+        }
+        
         powerUpCounter = 0;
         updateTaggerMaterial();
         print("reset player is called");
@@ -246,7 +255,18 @@ public class Player : MonoBehaviour
     
     public void updateTaggerMaterial()
     {
-            if (isTagger)
+        if (isTagger)
+        {
+            if (gameSettingsScript.noTagging) // always enable fire if tagging is disabled 
+            {
+                innerFire.SetActive(true);
+                outerFire.SetActive(true);
+                innerIce.SetActive(false);
+                outerIce.SetActive(false);
+                currentMatTagger = true;
+                this.GetComponent<Renderer>().material.mainTexture = taggerTexture[taggerTexture.Length - 1];
+            }
+            else
             {
                 innerIce.SetActive(false);
                 outerIce.SetActive(false);
@@ -260,6 +280,7 @@ public class Player : MonoBehaviour
                     textureAnimationScript.setColumns(1);
 
                 }
+
                 else
                 {
                     innerFire.SetActive(false);
@@ -278,8 +299,17 @@ public class Player : MonoBehaviour
                         smoke.SetActive(false);
                     }
                 }
-
-                trailscript.enabled = false;
+            }
+                if (!bothTrail)
+                {
+                    trailscript.enabled = false;
+                }
+                else
+                {
+                    trailscript.enabled = true;
+                    trailscript.trail.GetComponent<Renderer>().material = trailMaterialTagger;
+                    trailscript.trailMaterial = trailMaterialTagger;
+                }
             }
             else
             {
@@ -287,6 +317,7 @@ public class Player : MonoBehaviour
                 this.GetComponent<Renderer>().material.mainTexture = runnerTexture;
                 trailscript.enabled = true;
                 trailscript.trail.GetComponent<Renderer>().material = trailMaterial;
+                trailscript.trailMaterial = trailMaterial;
                 innerFire.SetActive(false);
                 outerFire.SetActive(false);
                 smoke.SetActive(false);

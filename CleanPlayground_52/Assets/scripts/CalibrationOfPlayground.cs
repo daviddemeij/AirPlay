@@ -22,8 +22,8 @@ public class CalibrationOfPlayground : MonoBehaviour {
 	public Vector2 bottomRight;
 	public Vector2 topLeftGame;
 	public Vector2 bottomRightGame;
-
-	//a boolean that decides whether factorshit can be calculated automaticall (yes), or that it should listen to handcalculated possible incorrect settings
+    public Boolean pcMode = false;
+	//a boolean that decides whether factorshit can be calculated automatically (yes), or that it should listen to handcalculated possible incorrect settings
 	public bool overwriteFactorShit = false;
 
 	//the other variables that are saved in the settings file are thus not really needed for calculating the transformation, but can be used to fidel around with settings seperatly,  you would need to set overwrite with manual in the settings file
@@ -59,9 +59,12 @@ public class CalibrationOfPlayground : MonoBehaviour {
 	//TODO when should this bbe done?  before the main kinectrigclient right?
 	// Use this for initialization
 	void Start () {
-		//do we need to have that for initmapping?
-		kinectRigClientScript = this.GetComponent("KinectRigClient") as KinectRigClient;
-		initMapping();
+        //do we need to have that for initmapping?
+        if (!pcMode)
+        {
+            kinectRigClientScript = this.GetComponent("KinectRigClient") as KinectRigClient;
+            initMapping();
+        }
 
 		//init to zero
 		lastIncomingPosition = Vector3.zero;

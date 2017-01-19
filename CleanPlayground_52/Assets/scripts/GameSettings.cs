@@ -7,9 +7,12 @@ public class GameSettings : MonoBehaviour
     public bool nextRound = true;
     public int nrOfPlayers = 0;
     public int nrOftaggers = 0;
-    public List<int> taggers;
-    public float textTimer = 0;
+    private List<int> taggers;
+    private float textTimer = 0;
     public Material[] trailMaterial;
+    public Material[] trailMaterialTagger;
+    public bool BothTrail; // gives both teams a trail to capture other players
+    public bool noTagging; // Disables tagging
     //we need to use a woozscript;
     Wooz woozScript;
 
@@ -26,6 +29,8 @@ public class GameSettings : MonoBehaviour
     [HideInInspector]public Vector3 stageDimensions;
     private GameObject coin1;
     private GameObject coin2;
+    private GameObject iceCoin1;
+    private GameObject iceCoin2;
     private GameObject backgroundImageObject;
     public bool isPause = false;
     // Use this for initialization
@@ -47,6 +52,18 @@ public class GameSettings : MonoBehaviour
         woozScript.AssignPlayerGameObjects(playerGameObjects);
         coin1 = GameObject.Find("Coin 1");
         coin2 = GameObject.Find("Coin 2");
+        iceCoin1 = GameObject.Find("IceCoin 1");
+        iceCoin2 = GameObject.Find("IceCoin 2");
+        if (noTagging)
+        {
+            coin1.active = false;
+            coin2.active = false;
+        }
+        else if (!BothTrail)
+        {
+            iceCoin1.active = false;
+            iceCoin2.active = false;
+        }
     }
 
     // Update is called once per frame
@@ -82,6 +99,10 @@ public class GameSettings : MonoBehaviour
                 }
                 else { gameObj.GetComponent<Player>().isTagger = false; }
                 gameObj.GetComponent<Player>().trailMaterial = trailMaterial[i % trailMaterial.Length];
+                if (BothTrail)
+                {
+                    gameObj.GetComponent<Player>().trailMaterialTagger = trailMaterialTagger[i % trailMaterialTagger.Length];
+                }
                 i++;
             }
             nextRound = false;
@@ -147,7 +168,10 @@ public class GameSettings : MonoBehaviour
                     
                     playerGameObjects[i] = gameObj.transform.gameObject;
                     playerGameObjects[i].GetComponent<Player>().trailMaterial = trailMaterial[i % trailMaterial.Length];
-
+                    if (BothTrail)
+                    {
+                        playerGameObjects[i].GetComponent<Player>().trailMaterialTagger = trailMaterialTagger[i % trailMaterialTagger.Length];
+                    }
                     //set the id of the players once
                     playerScript = playerGameObjects[i].GetComponent("Player") as Player;
                     playerScript.id = i;

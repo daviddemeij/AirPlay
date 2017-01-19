@@ -78,7 +78,7 @@ public class gameStateChecker : MonoBehaviour {
                 if (countdownCounter < 4)
                 {
                     timeSinceCountdown = Time.time;
-                    print(backgroundImageObject.gameObject.name);
+
                     backgroundImageObject.GetComponent<GUITexture>().texture = countdownTexture[countdownCounter];
                     countdownCounter++;
 
