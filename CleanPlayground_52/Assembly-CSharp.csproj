@@ -53,12 +53,12 @@
      <Compile Include="Assets\scripts\KinectRigClient.cs" />
      <Compile Include="Assets\scripts\Logger.cs" />
      <Compile Include="Assets\scripts\Player.cs" />
+     <Compile Include="Assets\scripts\RotateBackground.cs" />
      <Compile Include="Assets\scripts\Rotator.cs" />
      <Compile Include="Assets\scripts\Wooz.cs" />
      <Compile Include="Assets\scripts\buildMesh.cs" />
      <Compile Include="Assets\scripts\gameStateChecker.cs" />
      <Compile Include="Assets\scripts\movieScript.cs" />
-     <Compile Include="Assets\scripts\rotate.cs" />
      <Compile Include="Assets\scripts\texture_animation.cs" />
      <Compile Include="Assets\scripts\trailScript.cs" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />

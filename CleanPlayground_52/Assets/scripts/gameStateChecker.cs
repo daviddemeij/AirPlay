@@ -7,7 +7,7 @@ public class gameStateChecker : MonoBehaviour {
     [HideInInspector]public bool isInstruction = false;
     public Texture[] countdownTexture = new Texture[4];
     public AudioClip countdownAudio;
-    public Texture gameBackground;
+    public Texture[] gameBackgrounds;
     public Texture blueWinsTexture;
     public Texture redWinsTexture;
     private GameObject backgroundImageObject;
@@ -43,7 +43,7 @@ public class gameStateChecker : MonoBehaviour {
         {
             gameSettingsScript.nextRound = true;
             isAnnounceWinner = false;
-            backgroundImageObject.GetComponent<GUITexture>().texture = gameBackground;
+            backgroundImageObject.GetComponent<GUITexture>().texture = gameBackgrounds[gameSettingsScript.currentLevel];
         }
     }
 
@@ -86,7 +86,7 @@ public class gameStateChecker : MonoBehaviour {
                 else
                 {
                     IsCountdown = false;
-                    backgroundImageObject.GetComponent<GUITexture>().texture = gameBackground;
+                    backgroundImageObject.GetComponent<GUITexture>().texture = gameBackgrounds[gameSettingsScript.currentLevel];
 
                 }
             }

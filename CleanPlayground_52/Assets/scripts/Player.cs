@@ -4,18 +4,19 @@ using System.Collections;
 public class Player : MonoBehaviour
 {
     public bool isTagger;
-    private bool bothTrail;
+    [HideInInspector]public bool bothTrail;
     public int powerUpCounter = 0;
     public Texture runnerTexture;
-    public Texture[] taggerTexture;
+    public Texture taggerTexture;
+    public Texture safeTextureRed;
+    public Texture safeTextureBlue;
+    public int coinsRequired;
     public Material trailMaterial;
     public Material trailMaterialTagger;
-    [HideInInspector]
-    public bool currentMatTagger = false;
-
+    [HideInInspector]public bool currentMatTagger = false;
+    [HideInInspector]public bool inSafeHouse = false;
     //[HideInInspector]public GameObject[] lines;
-    [HideInInspector]
-    public GameObject collisionMeshObject;
+    [HideInInspector]public GameObject collisionMeshObject;
     public float positionx;
     public float positiony;
     public int id = -1;
@@ -32,6 +33,7 @@ public class Player : MonoBehaviour
     public bool death = false;
     bool previousDeath = false;
 
+    public GameObject coinsText;
     public bool woozIsOn = false;
     public bool singleWoozPlayer;
     public float singleWoozDeltatimeMultiplier = 100.0f; //changes the speed with which the wooz player is moved
@@ -61,7 +63,6 @@ public class Player : MonoBehaviour
     private trailScript trailscript;
     private GameSettings gameSettingsScript;
     private gameStateChecker gameStateCheckerScript;
-    private texture_animation textureAnimationScript;
 
     // Use this for initialization
     void Start()
@@ -77,7 +78,7 @@ public class Player : MonoBehaviour
         gameStateCheckerScript = mainCameraObject.GetComponent<gameStateChecker>();
         gameSettingsScript = mainCameraObject.GetComponent<GameSettings>();
         bothTrail = gameSettingsScript.BothTrail;
-        textureAnimationScript = this.GetComponent<texture_animation>();
+
 
         updateTaggerMaterial();
 
@@ -255,52 +256,69 @@ public class Player : MonoBehaviour
     
     public void updateTaggerMaterial()
     {
-        if (isTagger)
+        if (gameSettingsScript.singlePlayer)
         {
-            if (gameSettingsScript.noTagging) // always enable fire if tagging is disabled 
+            innerIce.SetActive(true);
+            outerIce.SetActive(true);
+            trailscript.enabled = false;
+            this.GetComponent<Renderer>().material.mainTexture = runnerTexture;
+        }
+        else
+        {
+
+
+            if (inSafeHouse)
             {
-                innerFire.SetActive(true);
-                outerFire.SetActive(true);
+                if (isTagger) { this.GetComponent<Renderer>().material.mainTexture = safeTextureRed; }
+                else { this.GetComponent<Renderer>().material.mainTexture = safeTextureBlue; }
                 innerIce.SetActive(false);
                 outerIce.SetActive(false);
-                currentMatTagger = true;
-                this.GetComponent<Renderer>().material.mainTexture = taggerTexture[taggerTexture.Length - 1];
+                innerFire.SetActive(false);
+                outerFire.SetActive(false);
+                smoke.SetActive(false);
+                currentMatTagger = false;
             }
-            else
+            else if (isTagger)
             {
-                innerIce.SetActive(false);
-                outerIce.SetActive(false);
-                currentMatTagger = true;
-                if (powerUpCounter >= taggerTexture.Length - 1)
+                if (gameSettingsScript.noTagging) // always enable fire if tagging is disabled 
                 {
-                    this.GetComponent<Renderer>().material.mainTexture = taggerTexture[taggerTexture.Length - 1];
                     innerFire.SetActive(true);
                     outerFire.SetActive(true);
-
-                    textureAnimationScript.setColumns(1);
-
+                    innerIce.SetActive(false);
+                    outerIce.SetActive(false);
+                    currentMatTagger = true;
+                    this.GetComponent<Renderer>().material.mainTexture = taggerTexture;
                 }
-
                 else
                 {
-                    innerFire.SetActive(false);
-                    outerFire.SetActive(false);
-
-
-                    this.GetComponent<Renderer>().material.mainTexture = taggerTexture[powerUpCounter];
-                    if (powerUpCounter >= taggerTexture.Length - 2)
+                    innerIce.SetActive(false);
+                    outerIce.SetActive(false);
+                    currentMatTagger = true;
+                    if (powerUpCounter >= coinsRequired)
                     {
-                        smoke.SetActive(true);
-                        textureAnimationScript.setColumns(4);
+                        this.GetComponent<Renderer>().material.mainTexture = taggerTexture;
+                        innerFire.SetActive(true);
+                        outerFire.SetActive(true);
                     }
+
                     else
                     {
-                        textureAnimationScript.setColumns(6);
-                        smoke.SetActive(false);
+                        innerFire.SetActive(false);
+                        outerFire.SetActive(false);
+
+
+                        this.GetComponent<Renderer>().material.mainTexture = taggerTexture;
+                        if (powerUpCounter >= coinsRequired - 1)
+                        {
+                            smoke.SetActive(true);
+                        }
+                        else
+                        {
+                            smoke.SetActive(false);
+                        }
                     }
                 }
-            }
-                if (!bothTrail)
+                if (!bothTrail || gameSettingsScript.noTrails)
                 {
                     trailscript.enabled = false;
                 }
@@ -315,37 +333,73 @@ public class Player : MonoBehaviour
             {
                 currentMatTagger = false;
                 this.GetComponent<Renderer>().material.mainTexture = runnerTexture;
-                trailscript.enabled = true;
-                trailscript.trail.GetComponent<Renderer>().material = trailMaterial;
-                trailscript.trailMaterial = trailMaterial;
-                innerFire.SetActive(false);
-                outerFire.SetActive(false);
-                smoke.SetActive(false);
-                innerIce.SetActive(true);
-                outerIce.SetActive(true);
-                textureAnimationScript.setColumns(1);
+                if (!gameSettingsScript.noTrails)
+                {
+                    trailscript.enabled = true;
+                    trailscript.trail.GetComponent<Renderer>().material = trailMaterial;
+                    trailscript.trailMaterial = trailMaterial;
+                }
+                else
+                {
+                    trailscript.enabled = false;
+                }
+                if (gameSettingsScript.noTagging || !gameSettingsScript.BothTrail)
+                {
+                    innerFire.SetActive(false);
+                    outerFire.SetActive(false);
+                    smoke.SetActive(false);
+                    innerIce.SetActive(true);
+                    outerIce.SetActive(true);
+
+                }
+                else
+                {
+                    currentMatTagger = true;
+                    if (powerUpCounter >= coinsRequired)
+                    {
+                        innerIce.SetActive(true);
+                        outerIce.SetActive(true);
+                    }
+                    else
+                    {
+                        innerIce.SetActive(false);
+                        outerIce.SetActive(false);
+                        if (powerUpCounter >= coinsRequired - 1)
+                        {
+                            smoke.SetActive(true);
+                        }
+                        else
+                        {
+                            smoke.SetActive(false);
+                        }
+                    }
+                }
+
             }
+        }
     }
     public void checkGameEnd()
     {
-        bool remainingPlayers = isTagger;
-        bool gameEnd = true;
-        foreach (var player in FindObjectsOfType(typeof(Player)) as Player[])
-        {
-            if (remainingPlayers != player.isTagger)
-            { gameEnd = false; }
-        }
-        if (gameEnd)
-        {
-            if (isTagger)
+        if (!gameSettingsScript.singlePlayer) { // On single player mode we don't have a game end
+            bool remainingPlayers = isTagger;
+            bool gameEnd = true;
+            foreach (var player in FindObjectsOfType(typeof(Player)) as Player[])
             {
-                print("red wins!");
-                gameStateCheckerScript.redWins();
+                if (remainingPlayers != player.isTagger)
+                { gameEnd = false; }
             }
-            else
+            if (gameEnd)
             {
-                print("blue wins!");
-                gameStateCheckerScript.blueWins();
+                if (isTagger)
+                {
+                    print("red wins!");
+                    gameStateCheckerScript.redWins();
+                }
+                else
+                {
+                    print("blue wins!");
+                    gameStateCheckerScript.blueWins();
+                }
             }
         }
 

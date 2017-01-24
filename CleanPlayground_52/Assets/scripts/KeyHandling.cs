@@ -63,7 +63,11 @@ public class KeyHandling : MonoBehaviour {
 
             SceneManager.LoadScene("airplay");
         }
-        if (Input.GetKeyUp(KeyCode.I))
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Interface");
+        }
+            if (Input.GetKeyUp(KeyCode.I))
         {
             if (isInstruction)
             {

@@ -13,6 +13,9 @@ public class GameSettings : MonoBehaviour
     public Material[] trailMaterialTagger;
     public bool BothTrail; // gives both teams a trail to capture other players
     public bool noTagging; // Disables tagging
+    public bool noTrails; // Disables trails
+    public bool singlePlayer = false;
+    public GameObject coinsText;
     //we need to use a woozscript;
     Wooz woozScript;
 
@@ -32,11 +35,27 @@ public class GameSettings : MonoBehaviour
     private GameObject iceCoin1;
     private GameObject iceCoin2;
     private GameObject backgroundImageObject;
+    private GameObject safeHouse;
+
     public bool isPause = false;
+    public int currentLevel;
     // Use this for initialization
     void Start()
     {
-
+        nrOfPlayers = PlayerPrefs.GetInt("NrPlayers");
+        nrOftaggers = PlayerPrefs.GetInt("NrTaggers");
+        currentLevel = PlayerPrefs.GetInt("Level");
+        print("current level" + currentLevel);
+        if (currentLevel == 0) { singlePlayer = true; }
+        else { singlePlayer = false; coinsText.SetActive(false); }
+        if (currentLevel == 1) { noTrails = false; noTagging = false; BothTrail = false; }
+        if (currentLevel == 2) { noTrails = true; noTagging = false;  BothTrail = false; }
+        if (currentLevel == 3) { noTagging = true; BothTrail = true; noTrails = false; }
+        if (currentLevel == 4 || currentLevel == 5){BothTrail = true; noTagging = false;  noTrails = false; }
+        if (nrOfPlayers == 1)
+        {
+            singlePlayer = true;
+        }
         stageDimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, Screen.height));
         print(stageDimensions.x + " x " + stageDimensions.y + " y " + stageDimensions.z + " z ");
         //loadplayers based on the number of player objects that are in the scene
@@ -50,29 +69,58 @@ public class GameSettings : MonoBehaviour
         woozScript.loadedGameObjects = false;
         //assigns the gameobjects and later on assigns the scripts
         woozScript.AssignPlayerGameObjects(playerGameObjects);
+        safeHouse = GameObject.Find("SafeHouse");
         coin1 = GameObject.Find("Coin 1");
         coin2 = GameObject.Find("Coin 2");
         iceCoin1 = GameObject.Find("IceCoin 1");
         iceCoin2 = GameObject.Find("IceCoin 2");
+        coin1.transform.position = new Vector3(Random.Range(0.65f, 2.95f), 0, Random.Range(-3.1f, -0.2f));
+        coin2.transform.position = new Vector3(Random.Range(0.65f, 2.95f), 0, Random.Range(-3.1f, -0.2f));
+        iceCoin1.transform.position = new Vector3(Random.Range(0.65f, 2.95f), 0, Random.Range(-3.1f, -0.2f));
+        iceCoin2.transform.position = new Vector3(Random.Range(0.65f, 2.95f), 0, Random.Range(-3.1f, -0.2f));
+
+        if (singlePlayer)
+        {
+            safeHouse.SetActive(false);
+            coin1.SetActive(false);
+            coin2.SetActive(false);
+            iceCoin1.SetActive(true);
+            iceCoin2.SetActive(true);
+        }
         if (noTagging)
         {
-            coin1.active = false;
-            coin2.active = false;
+            
+            coin1.SetActive(false);
+            coin2.SetActive(false);
+            iceCoin1.SetActive(false);
+            iceCoin2.SetActive(false);
         }
-        else if (!BothTrail)
+        else if (BothTrail || noTrails)
         {
-            iceCoin1.active = false;
-            iceCoin2.active = false;
+            iceCoin1.SetActive(true);
+            iceCoin2.SetActive(true);
+        }
+        else
+        {
+            iceCoin1.SetActive(false);
+            iceCoin2.SetActive(false);
         }
     }
 
     // Update is called once per frame
     
     void Update()
-    { 
-        
+    {
+        if (singlePlayer)
+        {
+            foreach (var gameObj in FindObjectsOfType(typeof(Player)) as Player[])
+            {
+                coinsText.GetComponent<GUIText>().text = ("Muntjes verzameld: " + gameObj.powerUpCounter);
+            }
+        }
         if (nextRound == true)
         {
+            
             int nrTaggersRemaining = nrOftaggers;
             taggers = new List<int>();
             int randomTagger;
@@ -108,6 +156,7 @@ public class GameSettings : MonoBehaviour
             nextRound = false;
 
         }
+        
 
     }
 

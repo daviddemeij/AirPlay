@@ -150,14 +150,14 @@ public class trailScript : MonoBehaviour
                     {
                         if (playerscript.id != gameObj.id)
                         {
-                            if (!playerscript.isTagger && gameObj.isTagger)
+                            if (!playerscript.isTagger && gameObj.isTagger && !gameObj.inSafeHouse)
                             {
                                 if (collisionMeshObject.GetComponent<MeshCollider>().bounds.Contains(gameObj.transform.position))
                                 {
                                     gameObj.isTagger = false;
                                 }
                             }
-                            else if (playerscript.isTagger && !gameObj.isTagger)
+                            else if (playerscript.isTagger && !gameObj.isTagger && !gameObj.inSafeHouse)
                             {
                                 if (collisionMeshObject.GetComponent<MeshCollider>().bounds.Contains(gameObj.transform.position))
                                 {

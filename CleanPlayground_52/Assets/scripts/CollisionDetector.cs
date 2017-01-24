@@ -31,12 +31,20 @@ public class CollisionDetector : MonoBehaviour {
 	void Update () {
         coinCountdown -= Time.deltaTime;
     }
-
+    void OnTriggerExit(Collider myTrigger)
+    {
+        string triggertag = myTrigger.gameObject.transform.tag;
+        if (triggertag == "SafeHouse")
+        {
+            thisPlayer.inSafeHouse = false;
+            thisPlayer.updateTaggerMaterial();
+        }
+    }
 	void OnTriggerEnter(Collider myTrigger)
 	{
         if (gameState != null && myTrigger != null )
         {
-            if (!gameState.IsCountdown && !gameState.isAnnounceWinner)
+            if (!gameState.IsCountdown && !gameState.isAnnounceWinner && !thisPlayer.inSafeHouse)
             {
 
                 //indeed player:
@@ -49,18 +57,16 @@ public class CollisionDetector : MonoBehaviour {
                     GameObject playerCollision = myTrigger.transform.parent.gameObject;
                     playSound();
 
-                    if (thisPlayer.isTagger && !playerCollision.GetComponent<Player>().isTagger)
+                    if(!playerCollision.GetComponent<Player>().inSafeHouse && (thisPlayer.isTagger || thisPlayer.bothTrail) && (thisPlayer.isTagger != playerCollision.GetComponent<Player>().isTagger))
                     {
-                        if (thisPlayer.powerUpCounter >= thisPlayer.taggerTexture.Length - 1)
+                        if (thisPlayer.powerUpCounter >= thisPlayer.coinsRequired)
                         {
                             playerCollision.GetComponent<Player>().resetPlayer();
                             thisPlayer.resetPlayer();
-                            playerCollision.GetComponent<Player>().isTagger = true;
-                            
+                            playerCollision.GetComponent<Player>().isTagger = thisPlayer.isTagger;
+                            playerCollision.GetComponent<Player>().updateTaggerMaterial();
                         }
                     }
-
-
                 }
 
                 else
@@ -71,15 +77,19 @@ public class CollisionDetector : MonoBehaviour {
                         playPowerUpSound(0);
                         thisPlayer.powerUpCounter++;
                         thisPlayer.updateTaggerMaterial();
-                        
                          myTrigger.transform.position = new Vector3(Random.Range(0.65f,2.95f), 0, Random.Range(-3.1f, -0.2f));
                     }
-                    if (triggertag == "IceCoin" && !thisPlayer.isTagger && coinCountdown <= 0)
+                    else if (triggertag == "IceCoin" && !thisPlayer.isTagger && coinCountdown <= 0)
                     {
                         playPowerUpSound(0);
                         thisPlayer.powerUpCounter++;
                         thisPlayer.updateTaggerMaterial();
                         myTrigger.transform.position = new Vector3(Random.Range(0.65f, 2.95f), 0, Random.Range(-3.1f, -0.2f));
+                    }
+                    else if(triggertag == "SafeHouse")
+                    {
+                        thisPlayer.inSafeHouse = true;
+                        thisPlayer.updateTaggerMaterial();
                     }
 
                 }
