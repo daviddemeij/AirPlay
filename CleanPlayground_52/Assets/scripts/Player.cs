@@ -4,7 +4,7 @@ using System.Collections;
 public class Player : MonoBehaviour
 {
     public bool isTagger;
-    [HideInInspector]public bool bothTrail;
+    public bool bothTrail;
     public int powerUpCounter = 0;
     public Texture runnerTexture;
     public Texture taggerTexture;
@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     public int id = -1;
     public int trackerid = -1;
     public int gameid = -1;
-
+    public bool noTrails;
 
     //this is automatically set at the start of the game and upon a change of number of alive players
     Vector3 targetPos = new Vector3(0, 0, 0);
@@ -78,7 +78,7 @@ public class Player : MonoBehaviour
         gameStateCheckerScript = mainCameraObject.GetComponent<gameStateChecker>();
         gameSettingsScript = mainCameraObject.GetComponent<GameSettings>();
         bothTrail = gameSettingsScript.BothTrail;
-
+        noTrails = gameSettingsScript.noTrails;
 
         updateTaggerMaterial();
 

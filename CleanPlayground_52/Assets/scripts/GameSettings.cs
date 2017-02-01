@@ -36,12 +36,22 @@ public class GameSettings : MonoBehaviour
     private GameObject iceCoin2;
     private GameObject backgroundImageObject;
     private GameObject safeHouse;
-
+    public float safeHouseTime; // time until safehouse spawns
+    private float safeHouseTimer; // time since last safehouse or start of the game;
     public bool isPause = false;
     public int currentLevel;
+    public Vector3[] safeHousePositions;
+    int safeHousePosition;
     // Use this for initialization
     void Start()
     {
+        safeHousePositions = new Vector3[4];
+        safeHousePositions[0] = new Vector3(0.84f,-5f,-0.34f);
+        safeHousePositions[1] = new Vector3(0.84f, -5f, -2.89f);
+        safeHousePositions[2] = new Vector3(2.76f, -5f, -0.34f);
+        safeHousePositions[3] = new Vector3(2.76f, -5f, -2.89f);
+        safeHouseTimer = Time.time;
+
         nrOfPlayers = PlayerPrefs.GetInt("NrPlayers");
         nrOftaggers = PlayerPrefs.GetInt("NrTaggers");
         currentLevel = PlayerPrefs.GetInt("Level");
@@ -118,9 +128,17 @@ public class GameSettings : MonoBehaviour
                 coinsText.GetComponent<GUIText>().text = ("Muntjes verzameld: " + gameObj.powerUpCounter);
             }
         }
+        else if(Time.time>safeHouseTimer + safeHouseTime)
+        {
+            safeHouseTimer = Time.time;
+            int pos = (int)Random.Range(0, 3);
+            print("Safehouse pos " + pos);
+            safeHouse.transform.position = safeHousePositions[pos];
+        }
         if (nextRound == true)
         {
-            
+            safeHouseTimer = Time.time;
+            safeHouse.transform.position = new Vector3(0f, -5f, 0f);
             int nrTaggersRemaining = nrOftaggers;
             taggers = new List<int>();
             int randomTagger;

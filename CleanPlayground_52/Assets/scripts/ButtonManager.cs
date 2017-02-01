@@ -11,7 +11,6 @@ public class ButtonManager : MonoBehaviour {
     private int oldNrPlayers = 1;
     private int nrPlayers = 0;
     public Color pressedColor;
-
     void Start()
     {
         nrPlayers = PlayerPrefs.GetInt("NrPlayers");
@@ -68,5 +67,5 @@ public class ButtonManager : MonoBehaviour {
         nrPlayersButtons[nrPlayers - 1].image.color = pressedColor;
         updateSlider();
     }
-        
+
 }
