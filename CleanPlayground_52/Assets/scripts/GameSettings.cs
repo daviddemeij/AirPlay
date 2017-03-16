@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class GameSettings : MonoBehaviour
 {
     public bool nextRound = true;
+    public bool coinBattle = false;
     public int nrOfPlayers = 0;
     public int nrOftaggers = 0;
     private List<int> taggers;
@@ -58,10 +59,11 @@ public class GameSettings : MonoBehaviour
         print("current level" + currentLevel);
         if (currentLevel == 0) { singlePlayer = true; }
         else { singlePlayer = false; coinsText.SetActive(false); }
-        if (currentLevel == 1) { noTrails = false; noTagging = false; BothTrail = false; }
-        if (currentLevel == 2) { noTrails = true; noTagging = false;  BothTrail = false; }
-        if (currentLevel == 3) { noTagging = true; BothTrail = true; noTrails = false; }
-        if (currentLevel == 4 || currentLevel == 5){BothTrail = true; noTagging = false;  noTrails = false; }
+        if (currentLevel == 1) { noTrails = true; noTagging = true; BothTrail = false; coinBattle = true; coinsText.SetActive(true);  }
+        if (currentLevel == 2) { noTrails = false; noTagging = true; BothTrail = true;}
+        if (currentLevel == 3) { noTagging = false; BothTrail = false; noTrails = false; }
+
+
         if (nrOfPlayers == 1)
         {
             singlePlayer = true;
@@ -97,7 +99,15 @@ public class GameSettings : MonoBehaviour
             iceCoin1.SetActive(true);
             iceCoin2.SetActive(true);
         }
-        if (noTagging)
+        if (coinBattle)
+        {
+            safeHouse.SetActive(false);
+            coin1.SetActive(true);
+            coin2.SetActive(true);
+            iceCoin1.SetActive(true);
+            iceCoin2.SetActive(true);
+        }
+        else if (noTagging)
         {
             
             coin1.SetActive(false);
@@ -126,6 +136,23 @@ public class GameSettings : MonoBehaviour
             foreach (var gameObj in FindObjectsOfType(typeof(Player)) as Player[])
             {
                 coinsText.GetComponent<GUIText>().text = ("Muntjes verzameld: " + gameObj.powerUpCounter);
+            }
+        }
+        if (coinBattle)
+        {
+            int taggerCoins = 0;
+            int runnerCoins = 0;
+            foreach (var gameObj in FindObjectsOfType(typeof(Player)) as Player[])
+            {
+                if (gameObj.isTagger)
+                {
+                    taggerCoins += gameObj.powerUpCounter;
+                }
+                else
+                {
+                    runnerCoins += gameObj.powerUpCounter;
+                }
+                coinsText.GetComponent<GUIText>().text = ("Rood: " + taggerCoins + " - Blauw: "+runnerCoins );
             }
         }
         else if(Time.time>safeHouseTimer + safeHouseTime)

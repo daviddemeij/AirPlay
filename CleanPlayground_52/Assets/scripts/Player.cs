@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
     public int trackerid = -1;
     public int gameid = -1;
     public bool noTrails;
+    public bool noTagging;
 
     //this is automatically set at the start of the game and upon a change of number of alive players
     Vector3 targetPos = new Vector3(0, 0, 0);
@@ -79,6 +80,7 @@ public class Player : MonoBehaviour
         gameSettingsScript = mainCameraObject.GetComponent<GameSettings>();
         bothTrail = gameSettingsScript.BothTrail;
         noTrails = gameSettingsScript.noTrails;
+        noTagging = gameSettingsScript.noTagging;
 
         updateTaggerMaterial();
 
@@ -280,7 +282,7 @@ public class Player : MonoBehaviour
             }
             else if (isTagger)
             {
-                if (gameSettingsScript.noTagging) // always enable fire if tagging is disabled 
+                if (noTagging) // always enable fire if tagging is disabled 
                 {
                     innerFire.SetActive(true);
                     outerFire.SetActive(true);
@@ -343,7 +345,7 @@ public class Player : MonoBehaviour
                 {
                     trailscript.enabled = false;
                 }
-                if (gameSettingsScript.noTagging || !gameSettingsScript.BothTrail)
+                if (noTagging || !gameSettingsScript.BothTrail)
                 {
                     innerFire.SetActive(false);
                     outerFire.SetActive(false);

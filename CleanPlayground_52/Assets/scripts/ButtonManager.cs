@@ -4,6 +4,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class ButtonManager : MonoBehaviour {
     public Text sliderText;
+    public Text levelText;
+    public Image[] stars;
+    public Image currentLevelImage;
+    public Sprite[] starsHighlighted;
+    public Sprite[] starsGray;
     public Slider stepsSlider;
     public Button[] levels;
     public int[] unlockLevel;
@@ -13,6 +18,7 @@ public class ButtonManager : MonoBehaviour {
     public Color pressedColor;
     void Start()
     {
+        levels[0].interactable = true;
         nrPlayers = PlayerPrefs.GetInt("NrPlayers");
         print(nrPlayers);
         stepsSlider.value = PlayerPrefs.GetFloat("stappen");
@@ -33,24 +39,31 @@ public class ButtonManager : MonoBehaviour {
     public void updateSlider() {
         sliderText.text = "Stappen: " + (stepsSlider.value*100).ToString("0");
         PlayerPrefs.SetFloat("stappen",stepsSlider.value);
-        if (nrPlayers > 1)
+        float nextLevel = 0;
+        currentLevelImage.sprite = starsHighlighted[0];
+        for (int i = 1; i < unlockLevel.Length; i++)
         {
-            levels[0].interactable = false;
-            for (int i = 1; i < unlockLevel.Length; i++)
+            if (stepsSlider.value * 100 >= unlockLevel[i])
             {
-                levels[i].interactable = (stepsSlider.value * 100 >= unlockLevel[i]);
-                print(stepsSlider.value * 100);
+                stars[i].sprite = starsHighlighted[i];
+                currentLevelImage.sprite = starsHighlighted[i];
             }
-        }
-        else
-        {
-            for (int i = 1; i < unlockLevel.Length; i++)
+            else
             {
-                levels[i].interactable = false;
+                stars[i].sprite = starsGray[i];
+                if(nextLevel == 0)
+                {
+                    nextLevel = unlockLevel[i] - (stepsSlider.value * 100);
+                }
             }
-            levels[0].interactable = true;
+ 
+            levels[i].interactable = (stepsSlider.value * 100 >= unlockLevel[i]);
+            print(stepsSlider.value * 100);
         }
-
+        
+      
+        if (nextLevel == 0) { levelText.text = "Je bent nu level         Gefeliciteerd!"; }
+        else { levelText.text = "Je bent nu level         nog " + nextLevel.ToString("0") + " stappen voor het volgende level!"; }
     }
     public void setLevel(int level)
     {

@@ -57,7 +57,7 @@ public class CollisionDetector : MonoBehaviour {
                     GameObject playerCollision = myTrigger.transform.parent.gameObject;
                     playSound();
 
-                    if (!playerCollision.GetComponent<Player>().inSafeHouse && (thisPlayer.isTagger || (thisPlayer.bothTrail || thisPlayer.noTrails)) && (thisPlayer.isTagger != playerCollision.GetComponent<Player>().isTagger))
+                    if (!playerCollision.GetComponent<Player>().inSafeHouse && !thisPlayer.noTagging && (thisPlayer.isTagger || (thisPlayer.bothTrail || thisPlayer.noTrails)) && (thisPlayer.isTagger != playerCollision.GetComponent<Player>().isTagger))
                     {
                         if (thisPlayer.powerUpCounter >= thisPlayer.coinsRequired)
                         {
